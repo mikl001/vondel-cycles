@@ -31,11 +31,69 @@
     "heroSubtitle": "Stadsfietsen, e-bikes en racefietsen — rechtstreeks uit onze werkplaats aan het Vondelpark.",
     "heroCta": "Bekijk de collectie",
     "comingSoon": "Webshop in aanbouw",
-    "comingSoonText": "We sleutelen nog aan de laatste onderdelen. Kom snel terug!"
+    "comingSoonText": "We sleutelen nog aan de laatste onderdelen. Kom snel terug!",
+    "categoriesTitle": "Ontdek onze collectie",
+    "featuredTitle": "Bestsellers",
+    "usp1": "Gratis verzending vanaf €50",
+    "usp2": "30 dagen retourneren",
+    "usp3": "Eigen werkplaats in Amsterdam"
   },
   "locale": {
     "switchTo": "Switch to English",
     "nl": "Nederlands",
     "en": "English"
+  },
+  "catalog": {
+    "inStock": "Op voorraad",
+    "outOfStock": "Uitverkocht",
+    "lowStock": "Nog {count} op voorraad",
+    "inclBtw": "incl. {rate}% btw",
+    "exclBtw": "excl. btw",
+    "addToCart": "In winkelwagen",
+    "chooseOptions": "Kies je uitvoering",
+    "specifications": "Specificaties",
+    "description": "Omschrijving",
+    "reviews": "Beoordelingen",
+    "reviewCount": "{count, plural, =0 {Nog geen beoordelingen} one {# beoordeling} other {# beoordelingen}}",
+    "demoReview": "Demo-review",
+    "related": "Anderen bekeken ook",
+    "crossSell": "Maak je fiets compleet",
+    "products": "{count, plural, =0 {Geen producten} one {# product} other {# producten}}",
+    "showMore": "Toon meer",
+    "sku": "Artikelnummer",
+    "freeShipping": "Gratis verzending vanaf €50",
+    "delivery": "Voor 22:00 besteld, morgen in huis",
+    "warranty": "2 jaar Vondel-garantie"
+  },
+  "filters": {
+    "title": "Filters",
+    "price": "Prijs",
+    "priceMin": "Min",
+    "priceMax": "Max",
+    "onlyInStock": "Alleen op voorraad",
+    "clearAll": "Wis alle filters",
+    "apply": "Toepassen",
+    "showResults": "Toon resultaten",
+    "sortLabel": "Sorteren",
+    "sort": {
+      "newest": "Nieuwste",
+      "price_asc": "Prijs: laag naar hoog",
+      "price_desc": "Prijs: hoog naar laag",
+      "name": "Naam A-Z",
+      "relevance": "Relevantie"
+    },
+    "noResults": "Geen producten gevonden met deze filters.",
+    "pagination": {
+      "previous": "Vorige",
+      "next": "Volgende",
+      "page": "Pagina {page} van {total}"
+    }
+  },
+  "search": {
+    "title": "Zoekresultaten",
+    "resultsFor": "Resultaten voor \"{query}\"",
+    "noResults": "Niets gevonden voor \"{query}\". Probeer een andere zoekterm.",
+    "placeholder": "Zoek fietsen, accessoires…",
+    "suggestionsLabel": "Suggesties"
   }
 }

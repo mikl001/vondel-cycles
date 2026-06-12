@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { getCategoryTree } from "@/lib/catalog/queries";
 
 export default async function StorefrontLayout({
   children,
@@ -13,9 +14,11 @@ export default async function StorefrontLayout({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const categories = await getCategoryTree();
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader categories={categories} />
       <main id="content" className="flex-1">
         {children}
       </main>
