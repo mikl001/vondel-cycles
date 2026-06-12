@@ -4,7 +4,9 @@ import { setRequestLocale } from "next-intl/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/seo/json-ld";
 import { routing } from "@/i18n/routing";
+import { organizationJsonLd } from "@/lib/seo";
 
 import "../globals.css";
 
@@ -19,11 +21,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
     default: "Vondel Cycles",
     template: "%s | Vondel Cycles",
   },
   description: "Fietsen uit Amsterdam, sinds 1998 — demo webshop",
+  openGraph: {
+    siteName: "Vondel Cycles",
+    type: "website",
+  },
 };
 
 export function generateStaticParams() {
@@ -49,6 +56,7 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-screen flex-col">
+        <JsonLd data={organizationJsonLd()} />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

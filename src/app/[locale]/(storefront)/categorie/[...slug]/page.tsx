@@ -19,6 +19,7 @@ import {
   listProducts,
 } from "@/lib/catalog/queries";
 import { lt } from "@/lib/format";
+import { absoluteUrl, languageAlternates } from "@/lib/seo";
 import type { LocalizedText } from "@/types/catalog";
 
 interface Props {
@@ -27,20 +28,29 @@ interface Props {
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = rawLocale as Locale;
   const tree = await getCategoryTree();
   const found = findCategoryBySlug(tree, slug);
   if (!found) return {};
 
   const filters = parseCatalogParams(await searchParams);
   const filterCount = activeFilterCount(filters);
-  const name = lt(found.category.name, locale as Locale);
+  const hrefFor = (l: Locale) =>
+    ({
+      pathname: "/categorie/[...slug]",
+      params: { slug: found.trail.map((n) => lt(n.slug, l)) },
+    }) as const;
 
   return {
-    title: name,
-    description: lt(found.category.description as LocalizedText, locale as Locale),
-    // Filtered/paginated views canonicalize to the clean category URL and
-    // stay out of the index once more than one filter is active.
+    title: lt(found.category.name, locale),
+    description: lt(found.category.description as LocalizedText, locale),
+    alternates: {
+      // Filtered/paginated views canonicalize to the clean category URL
+      canonical: absoluteUrl(locale, hrefFor(locale)),
+      languages: languageAlternates(hrefFor),
+    },
+    // ...and stay out of the index once more than one filter is active.
     robots: filterCount > 1 ? { index: false, follow: true } : undefined,
   };
 }

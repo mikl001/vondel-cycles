@@ -6,6 +6,7 @@ import { Breadcrumbs, type Crumb } from "@/components/catalog/breadcrumbs";
 import { ProductCard } from "@/components/catalog/product-card";
 import { ProductView } from "@/components/catalog/product-view";
 import { StarRating } from "@/components/catalog/star-rating";
+import { JsonLd } from "@/components/seo/json-ld";
 import { routing, type Locale } from "@/i18n/routing";
 import {
   getAllProductSlugs,
@@ -14,7 +15,8 @@ import {
   getProductReviews,
   getRelatedProducts,
 } from "@/lib/catalog/queries";
-import { lt } from "@/lib/format";
+import { lt, productImageUrl } from "@/lib/format";
+import { absoluteUrl, breadcrumbJsonLd, languageAlternates, productJsonLd } from "@/lib/seo";
 import type { CategoryNode, LocalizedText } from "@/types/catalog";
 
 export const revalidate = 300;
@@ -32,12 +34,29 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = rawLocale as Locale;
   const product = await getProductBySlug(slug);
   if (!product) return {};
+
+  const hrefFor = (l: Locale) =>
+    ({ pathname: "/product/[slug]", params: { slug: lt(product.slug, l) } }) as const;
+  const description = lt(product.description, locale)?.slice(0, 160);
+
   return {
-    title: lt(product.name, locale as Locale),
-    description: lt(product.description, locale as Locale)?.slice(0, 160),
+    title: lt(product.name, locale),
+    description,
+    alternates: {
+      canonical: absoluteUrl(locale, hrefFor(locale)),
+      languages: languageAlternates(hrefFor),
+    },
+    openGraph: {
+      title: lt(product.name, locale),
+      description,
+      images: product.images
+        .slice(0, 1)
+        .map((i) => ({ url: productImageUrl(i.storagePath) })),
+    },
   };
 }
 
@@ -84,6 +103,13 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <JsonLd data={productJsonLd(product, summary, locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd(
+          crumbs.map((c) => ({ name: c.label, href: c.href })),
+          locale,
+        )}
+      />
       <Breadcrumbs crumbs={crumbs} />
 
       <div className="mt-6">

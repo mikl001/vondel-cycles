@@ -5,9 +5,22 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getCategoryTree, getProductsByTag } from "@/lib/catalog/queries";
 import { lt } from "@/lib/format";
+import { absoluteUrl, languageAlternates } from "@/lib/seo";
 import type { LocalizedText } from "@/types/catalog";
 
 export const revalidate = 300;
+
+export async function generateMetadata({
+  params,
+}: Readonly<{ params: Promise<{ locale: string }> }>) {
+  const { locale } = await params;
+  return {
+    alternates: {
+      canonical: absoluteUrl(locale as Locale, { pathname: "/" }),
+      languages: languageAlternates(() => ({ pathname: "/" })),
+    },
+  };
+}
 
 export default async function HomePage({
   params,
