@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { resolveCartIdentity } from "@/lib/cart/identity";
 import {
   addItem,
   buildCartView,
   CART_COOKIE,
   createGuestCart,
-  getCartIdByToken,
 } from "@/lib/cart/server";
 import { isSameOrigin } from "@/lib/security";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -35,12 +35,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = createAdminClient();
-    const existingToken = request.cookies.get(CART_COOKIE)?.value;
-    const token =
-      existingToken && UUID_RE.test(existingToken) ? existingToken : randomUUID();
+    const identity = await resolveCartIdentity();
 
-    let cartId = await getCartIdByToken(supabase, token);
-    cartId ??= await createGuestCart(supabase, token);
+    let cartId = identity.cartId;
+    let newGuestToken: string | null = null;
+    if (!cartId) {
+      // guest without a cart yet: mint a token + cart
+      newGuestToken = identity.token ?? randomUUID();
+      cartId = await createGuestCart(supabase, newGuestToken);
+    }
 
     const { adjusted } = await addItem(supabase, cartId, variantId, quantity);
     const view = await buildCartView(supabase, cartId);
@@ -49,13 +52,15 @@ export async function POST(request: NextRequest) {
       { ...view, adjusted },
       { headers: { "Cache-Control": "no-store" } },
     );
-    response.cookies.set(CART_COOKIE, token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 90, // 90 days
-    });
+    if (newGuestToken) {
+      response.cookies.set(CART_COOKIE, newGuestToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 90, // 90 days
+      });
+    }
     return response;
   } catch (err) {
     const status = (err as { status?: number }).status ?? 500;

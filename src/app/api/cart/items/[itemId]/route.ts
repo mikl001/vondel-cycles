@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import {
-  buildCartView,
-  CART_COOKIE,
-  getCartIdByToken,
-  removeItem,
-  setItemQuantity,
-} from "@/lib/cart/server";
+import { resolveCartIdentity } from "@/lib/cart/identity";
+import { buildCartView, removeItem, setItemQuantity } from "@/lib/cart/server";
 import { isSameOrigin } from "@/lib/security";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -14,14 +9,6 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type Context = { params: Promise<{ itemId: string }> };
-
-async function resolveCart(request: NextRequest) {
-  const token = request.cookies.get(CART_COOKIE)?.value;
-  if (!token || !UUID_RE.test(token)) return null;
-  const supabase = createAdminClient();
-  const cartId = await getCartIdByToken(supabase, token);
-  return cartId ? { supabase, cartId } : null;
-}
 
 export async function PATCH(request: NextRequest, { params }: Context) {
   if (!isSameOrigin(request)) {
@@ -44,10 +31,11 @@ export async function PATCH(request: NextRequest, { params }: Context) {
   }
 
   try {
-    const ctx = await resolveCart(request);
-    if (!ctx) return NextResponse.json({ error: "No cart" }, { status: 404 });
-    const { adjusted } = await setItemQuantity(ctx.supabase, ctx.cartId, itemId, quantity);
-    const view = await buildCartView(ctx.supabase, ctx.cartId);
+    const { cartId } = await resolveCartIdentity();
+    if (!cartId) return NextResponse.json({ error: "No cart" }, { status: 404 });
+    const supabase = createAdminClient();
+    const { adjusted } = await setItemQuantity(supabase, cartId, itemId, quantity);
+    const view = await buildCartView(supabase, cartId);
     return NextResponse.json(
       { ...view, adjusted },
       { headers: { "Cache-Control": "no-store" } },
@@ -69,10 +57,11 @@ export async function DELETE(request: NextRequest, { params }: Context) {
   }
 
   try {
-    const ctx = await resolveCart(request);
-    if (!ctx) return NextResponse.json({ error: "No cart" }, { status: 404 });
-    await removeItem(ctx.supabase, ctx.cartId, itemId);
-    const view = await buildCartView(ctx.supabase, ctx.cartId);
+    const { cartId } = await resolveCartIdentity();
+    if (!cartId) return NextResponse.json({ error: "No cart" }, { status: 404 });
+    const supabase = createAdminClient();
+    await removeItem(supabase, cartId, itemId);
+    const view = await buildCartView(supabase, cartId);
     return NextResponse.json(view, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     console.error("[cart] DELETE failed:", err);

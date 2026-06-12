@@ -79,6 +79,71 @@ export async function createGuestCart(
   return data.id;
 }
 
+export async function getCartIdByUser(
+  supabase: Admin,
+  userId: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("carts")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .maybeSingle();
+  if (error) throw error;
+  return data?.id ?? null;
+}
+
+export async function getOrCreateUserCart(
+  supabase: Admin,
+  userId: string,
+): Promise<string> {
+  const existing = await getCartIdByUser(supabase, userId);
+  if (existing) return existing;
+  const { data, error } = await supabase
+    .from("carts")
+    .insert({ user_id: userId })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data.id;
+}
+
+/**
+ * On login: fold the guest cart into the user's cart (sum quantities) or,
+ * when the user has no active cart, simply adopt the guest cart.
+ */
+export async function mergeGuestCartIntoUserCart(
+  supabase: Admin,
+  token: string,
+  userId: string,
+): Promise<void> {
+  const guestCartId = await getCartIdByToken(supabase, token);
+  if (!guestCartId) return;
+
+  const userCartId = await getCartIdByUser(supabase, userId);
+  if (!userCartId) {
+    const { error } = await supabase
+      .from("carts")
+      .update({ user_id: userId, anon_token: null })
+      .eq("id", guestCartId);
+    if (error) throw error;
+    return;
+  }
+
+  const { data: guestItems, error } = await supabase
+    .from("cart_items")
+    .select("variant_id, quantity")
+    .eq("cart_id", guestCartId);
+  if (error) throw error;
+
+  for (const item of guestItems) {
+    await addItem(supabase, userCartId, item.variant_id, item.quantity).catch(
+      () => {}, // out-of-stock guest leftovers are dropped silently
+    );
+  }
+  await supabase.from("carts").delete().eq("id", guestCartId);
+}
+
 export async function buildCartView(
   supabase: Admin,
   cartId: string,

@@ -171,6 +171,100 @@
     "pickupAt": "Afhaalpunt",
     "backToShop": "Terug naar de winkel"
   },
+  "auth": {
+    "login": "Inloggen",
+    "register": "Account aanmaken",
+    "logout": "Uitloggen",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "fullName": "Naam",
+    "loginButton": "Inloggen",
+    "registerButton": "Account aanmaken",
+    "magicLink": "Of stuur mij een inloglink",
+    "magicLinkSent": "Inloglink verstuurd! Check je inbox (lokaal: Mailpit op poort 54324).",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "resetButton": "Verstuur herstellink",
+    "resetSent": "Herstellink verstuurd! Check je inbox.",
+    "noAccount": "Nog geen account?",
+    "haveAccount": "Al een account?",
+    "checkEmail": "Check je inbox om je account te bevestigen.",
+    "errors": {
+      "invalid_credentials": "Onjuiste combinatie van e-mail en wachtwoord.",
+      "user_already_exists": "Er bestaat al een account met dit e-mailadres.",
+      "weak_password": "Het wachtwoord moet minimaal 8 tekens lang zijn.",
+      "error": "Er ging iets mis. Probeer het opnieuw."
+    }
+  },
+  "account": {
+    "title": "Mijn account",
+    "welcome": "Welkom terug",
+    "nav": {
+      "overview": "Overzicht",
+      "orders": "Bestellingen",
+      "addresses": "Adressen",
+      "wishlist": "Verlanglijst",
+      "privacy": "Privacy & gegevens"
+    },
+    "profile": {
+      "title": "Profiel",
+      "save": "Opslaan",
+      "saved": "Opgeslagen",
+      "consents": "Voorkeuren & toestemmingen",
+      "marketingEmails": "Ik wil de nieuwsbrief ontvangen",
+      "analyticsConsent": "Anonieme statistieken zijn oké (analytics)"
+    },
+    "orders": {
+      "title": "Mijn bestellingen",
+      "empty": "Je hebt nog geen bestellingen geplaatst.",
+      "order": "Bestelling",
+      "status": "Status",
+      "total": "Totaal",
+      "tracking": "Track & trace",
+      "invoice": "Factuur (PDF)",
+      "reorder": "Opnieuw bestellen",
+      "reordered": "Artikelen toegevoegd aan je winkelwagen",
+      "statuses": {
+        "pending": "In afwachting van betaling",
+        "paid": "Betaald",
+        "processing": "Wordt verwerkt",
+        "shipped": "Onderweg",
+        "delivered": "Bezorgd",
+        "cancelled": "Geannuleerd",
+        "refunded": "Terugbetaald",
+        "failed": "Mislukt",
+        "expired": "Verlopen"
+      }
+    },
+    "addresses": {
+      "title": "Mijn adressen",
+      "empty": "Nog geen adressen opgeslagen.",
+      "add": "Adres toevoegen",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "label": "Label (bijv. Thuis, Werk)",
+      "default": "Standaardadres",
+      "makeDefault": "Maak standaard"
+    },
+    "wishlist": {
+      "title": "Mijn verlanglijst",
+      "empty": "Je verlanglijst is nog leeg.",
+      "addToWishlist": "Bewaar in verlanglijst",
+      "removeFromWishlist": "Verwijder uit verlanglijst"
+    },
+    "privacy": {
+      "title": "Privacy & gegevens (AVG)",
+      "exportTitle": "Download je gegevens",
+      "exportText": "Ontvang een JSON-bestand met al je opgeslagen gegevens: profiel, adressen, bestellingen en verlanglijst.",
+      "exportButton": "Download mijn gegevens",
+      "deleteTitle": "Account verwijderen",
+      "deleteText": "Je account en persoonsgegevens worden permanent verwijderd. Bestellingen worden geanonimiseerd (wettelijke bewaarplicht voor facturen blijft gelden).",
+      "deleteButton": "Verwijder mijn account",
+      "deleteConfirm": "Typ VERWIJDER om te bevestigen",
+      "deleted": "Je account is verwijderd."
+    }
+  },
   "search": {
     "title": "Zoekresultaten",
     "resultsFor": "Resultaten voor \"{query}\"",

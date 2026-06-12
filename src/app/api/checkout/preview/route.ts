@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { CART_COOKIE } from "@/lib/cart/server";
+import { resolveCartIdentity } from "@/lib/cart/identity";
 import {
   CheckoutError,
   priceCheckout,
@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const cartToken = request.cookies.get(CART_COOKIE)?.value;
-  if (!cartToken) {
+  const { cartId } = await resolveCartIdentity();
+  if (!cartId) {
     return NextResponse.json({ error: "empty_cart" }, { status: 400 });
   }
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const priced = await priceCheckout(createAdminClient(), cartToken, {
+    const priced = await priceCheckout(createAdminClient(), cartId, {
       shippingMethodCode: body.shippingMethodCode ?? "postnl-standard",
       promoCode: body.promoCode || undefined,
       reverseCharge: qualifiesForReverseCharge(

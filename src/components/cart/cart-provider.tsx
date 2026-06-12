@@ -41,17 +41,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/cart")
-      .then((res) => (res.ok ? res.json() : EMPTY_CART))
-      .then((data) => {
-        if (!cancelled) setCart(data);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setPending(false);
-      });
+    const load = () =>
+      fetch("/api/cart")
+        .then((res) => (res.ok ? res.json() : EMPTY_CART))
+        .then((data) => {
+          if (!cancelled) setCart(data);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (!cancelled) setPending(false);
+        });
+    void load();
+    // external mutations (reorder, login merge) announce themselves via event
+    const onRefresh = () => void load();
+    window.addEventListener("cart:refresh", onRefresh);
     return () => {
       cancelled = true;
+      window.removeEventListener("cart:refresh", onRefresh);
     };
   }, []);
 

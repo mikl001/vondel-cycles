@@ -2,12 +2,15 @@ import createIntlMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
+import { updateSession } from "@/lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-export default function proxy(request: NextRequest) {
-  // Supabase session refresh is composed here once auth lands (Phase 6).
-  return intlMiddleware(request);
+export default async function proxy(request: NextRequest) {
+  // intl first (may redirect/rewrite), then refresh the Supabase session
+  // onto whatever response intl produced.
+  const response = intlMiddleware(request);
+  return updateSession(request, response);
 }
 
 export const config = {

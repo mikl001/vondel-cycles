@@ -4,7 +4,7 @@ import { getEmailAdapter } from "@/lib/adapters/email";
 import { getPaymentAdapter, type PaymentStatus } from "@/lib/adapters/payments";
 import { NL_POSTCODE_RE } from "@/lib/adapters/postcode";
 import { shippingCostCents } from "@/lib/adapters/shipping";
-import { buildCartView, getCartIdByToken } from "@/lib/cart/server";
+import { buildCartView } from "@/lib/cart/server";
 import {
   calculateOrderTotals,
   type Discount,
@@ -122,11 +122,9 @@ export interface PricedCheckout {
  */
 export async function priceCheckout(
   supabase: Admin,
-  cartToken: string,
+  cartId: string,
   opts: { shippingMethodCode: string; promoCode?: string; reverseCharge: boolean },
 ): Promise<PricedCheckout> {
-  const cartId = await getCartIdByToken(supabase, cartToken);
-  if (!cartId) throw new CheckoutError("empty_cart");
   const cart = await buildCartView(supabase, cartId);
   if (cart.items.length === 0) throw new CheckoutError("empty_cart");
 
@@ -162,7 +160,8 @@ export async function priceCheckout(
 }
 
 export async function createOrder(
-  cartToken: string,
+  cartId: string,
+  userId: string | null,
   input: CheckoutInput,
 ): Promise<{ orderId: string; checkoutUrl: string; confirmationToken: string }> {
   if (
@@ -176,7 +175,7 @@ export async function createOrder(
 
   const supabase = createAdminClient();
   const reverseCharge = qualifiesForReverseCharge(input.customerType, input.vatNumber);
-  const priced = await priceCheckout(supabase, cartToken, {
+  const priced = await priceCheckout(supabase, cartId, {
     shippingMethodCode: input.shippingMethodCode,
     promoCode: input.promoCode,
     reverseCharge,
@@ -189,13 +188,13 @@ export async function createOrder(
     }
   }
 
-  const cartId = await getCartIdByToken(supabase, cartToken);
   const adapter = getPaymentAdapter();
 
   const { data: order, error } = await supabase
     .from("orders")
     .insert({
       cart_id: cartId,
+      user_id: userId,
       email: input.email.trim().toLowerCase(),
       payment_provider: adapter.provider,
       locale: input.locale,

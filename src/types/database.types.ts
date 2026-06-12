@@ -183,6 +183,35 @@ export type Database = {
         payload: Json | null;
         created_at: string;
       }>;
+      profiles: Table<{
+        id: string;
+        full_name: string;
+        phone: string | null;
+        marketing_emails: boolean;
+        analytics_consent: boolean;
+        created_at: string;
+        updated_at: string;
+      }>;
+      addresses: Table<{
+        id: string;
+        user_id: string;
+        label: string;
+        first_name: string;
+        last_name: string;
+        street: string;
+        house_number: string;
+        addition: string | null;
+        postcode: string;
+        city: string;
+        country: string;
+        is_default: boolean;
+        created_at: string;
+      }>;
+      wishlists: Table<{
+        user_id: string;
+        product_id: string;
+        created_at: string;
+      }>;
       reviews: Table<{
         id: string;
         product_id: string;

@@ -171,6 +171,100 @@
     "pickupAt": "Pickup point",
     "backToShop": "Back to the shop"
   },
+  "auth": {
+    "login": "Log in",
+    "register": "Create account",
+    "logout": "Log out",
+    "email": "Email address",
+    "password": "Password",
+    "fullName": "Name",
+    "loginButton": "Log in",
+    "registerButton": "Create account",
+    "magicLink": "Or email me a login link",
+    "magicLinkSent": "Login link sent! Check your inbox (local: Mailpit on port 54324).",
+    "forgotPassword": "Forgot your password?",
+    "resetButton": "Send reset link",
+    "resetSent": "Reset link sent! Check your inbox.",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "checkEmail": "Check your inbox to confirm your account.",
+    "errors": {
+      "invalid_credentials": "Incorrect email and password combination.",
+      "user_already_exists": "An account with this email already exists.",
+      "weak_password": "The password must be at least 8 characters.",
+      "error": "Something went wrong. Please try again."
+    }
+  },
+  "account": {
+    "title": "My account",
+    "welcome": "Welcome back",
+    "nav": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "addresses": "Addresses",
+      "wishlist": "Wishlist",
+      "privacy": "Privacy & data"
+    },
+    "profile": {
+      "title": "Profile",
+      "save": "Save",
+      "saved": "Saved",
+      "consents": "Preferences & consents",
+      "marketingEmails": "I'd like to receive the newsletter",
+      "analyticsConsent": "Anonymous statistics are fine (analytics)"
+    },
+    "orders": {
+      "title": "My orders",
+      "empty": "You haven't placed any orders yet.",
+      "order": "Order",
+      "status": "Status",
+      "total": "Total",
+      "tracking": "Track & trace",
+      "invoice": "Invoice (PDF)",
+      "reorder": "Order again",
+      "reordered": "Items added to your cart",
+      "statuses": {
+        "pending": "Awaiting payment",
+        "paid": "Paid",
+        "processing": "Processing",
+        "shipped": "On its way",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+        "refunded": "Refunded",
+        "failed": "Failed",
+        "expired": "Expired"
+      }
+    },
+    "addresses": {
+      "title": "My addresses",
+      "empty": "No addresses saved yet.",
+      "add": "Add address",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "label": "Label (e.g. Home, Work)",
+      "default": "Default address",
+      "makeDefault": "Make default"
+    },
+    "wishlist": {
+      "title": "My wishlist",
+      "empty": "Your wishlist is still empty.",
+      "addToWishlist": "Save to wishlist",
+      "removeFromWishlist": "Remove from wishlist"
+    },
+    "privacy": {
+      "title": "Privacy & data (GDPR)",
+      "exportTitle": "Download your data",
+      "exportText": "Receive a JSON file with everything we store about you: profile, addresses, orders and wishlist.",
+      "exportButton": "Download my data",
+      "deleteTitle": "Delete account",
+      "deleteText": "Your account and personal data will be permanently deleted. Orders are anonymized (legal retention for invoices still applies).",
+      "deleteButton": "Delete my account",
+      "deleteConfirm": "Type DELETE to confirm",
+      "deleted": "Your account has been deleted."
+    }
+  },
   "search": {
     "title": "Search results",
     "resultsFor": "Results for \"{query}\"",

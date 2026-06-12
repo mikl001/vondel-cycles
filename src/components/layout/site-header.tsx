@@ -64,6 +64,16 @@ export function SiteHeader({ categories }: { categories: CategoryNode[] }) {
 
         <div className="flex shrink-0 items-center gap-3">
           <LocaleSwitcher />
+          <Link
+            href="/account"
+            aria-label={t("nav.account")}
+            className="rounded-full p-2 text-vondel-700 transition-colors hover:bg-vondel-50"
+          >
+            <svg viewBox="0 0 24 24" className="h-6 w-6 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round">
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M5 20c.8-3.5 3.6-5.4 7-5.4s6.2 1.9 7 5.4" />
+            </svg>
+          </Link>
           <CartButton />
         </div>
       </div>

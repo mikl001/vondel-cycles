@@ -38,6 +38,29 @@ export const routing = defineRouting({
       nl: "/betaling/[orderId]",
       en: "/payment/[orderId]",
     },
+    "/login": "/login",
+    "/registreren": {
+      nl: "/registreren",
+      en: "/register",
+    },
+    "/wachtwoord-vergeten": {
+      nl: "/wachtwoord-vergeten",
+      en: "/forgot-password",
+    },
+    "/account": "/account",
+    "/account/bestellingen": {
+      nl: "/account/bestellingen",
+      en: "/account/orders",
+    },
+    "/account/adressen": {
+      nl: "/account/adressen",
+      en: "/account/addresses",
+    },
+    "/account/verlanglijst": {
+      nl: "/account/verlanglijst",
+      en: "/account/wishlist",
+    },
+    "/account/privacy": "/account/privacy",
   },
 });
 

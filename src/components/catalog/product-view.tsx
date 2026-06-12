@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
+import { WishlistButton } from "@/components/account/wishlist-button";
 import { useCart } from "@/components/cart/cart-provider";
 import type { Locale } from "@/i18n/routing";
 import { formatCents, inclBtwCents, lt, productImageUrl } from "@/lib/format";
@@ -206,14 +207,17 @@ export function ProductView({ product }: { product: ProductDetail }) {
             )
           ) : null}
 
-          <button
-            type="button"
-            disabled={!selectedVariant || selectedVariant.stockQuantity === 0 || pending}
-            onClick={() => selectedVariant && addToCart(selectedVariant.id)}
-            className="rounded-xl bg-vondel-700 px-6 py-3.5 font-semibold text-white transition-colors hover:bg-vondel-600 disabled:cursor-not-allowed disabled:bg-vondel-200"
-          >
-            {t("addToCart")}
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={!selectedVariant || selectedVariant.stockQuantity === 0 || pending}
+              onClick={() => selectedVariant && addToCart(selectedVariant.id)}
+              className="flex-1 rounded-xl bg-vondel-700 px-6 py-3.5 font-semibold text-white transition-colors hover:bg-vondel-600 disabled:cursor-not-allowed disabled:bg-vondel-200"
+            >
+              {t("addToCart")}
+            </button>
+            <WishlistButton productId={product.id} />
+          </div>
 
           {selectedVariant && (
             <p className="text-xs text-vondel-400">

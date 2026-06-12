@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { CART_COOKIE } from "@/lib/cart/server";
+import { resolveCartIdentity } from "@/lib/cart/identity";
 import {
   CheckoutError,
   createOrder,
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const cartToken = request.cookies.get(CART_COOKIE)?.value;
-  if (!cartToken) {
+  const { cartId, userId } = await resolveCartIdentity();
+  if (!cartId) {
     return NextResponse.json({ error: "empty_cart" }, { status: 400 });
   }
 
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   if (input.locale !== "nl" && input.locale !== "en") input.locale = "nl";
 
   try {
-    const result = await createOrder(cartToken, input);
+    const result = await createOrder(cartId, userId, input);
     return NextResponse.json(result);
   } catch (err) {
     if (err instanceof CheckoutError) {
