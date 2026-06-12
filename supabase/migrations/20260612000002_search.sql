@@ -52,7 +52,7 @@ as $$
         else greatest(
           ts_rank(p.search_vector, websearch_to_tsquery('dutch', p_search)),
           ts_rank(p.search_vector, websearch_to_tsquery('english', p_search)),
-          similarity(p.search_text, p_search)
+          word_similarity(p_search, p.search_text)
         )
       end as rank
     from public.products p
@@ -71,7 +71,7 @@ as $$
         p_search is null
         or p.search_vector @@ websearch_to_tsquery('dutch', p_search)
         or p.search_vector @@ websearch_to_tsquery('english', p_search)
-        or similarity(p.search_text, p_search) > 0.2
+        or word_similarity(p_search, p.search_text) > 0.4
       )
       and not exists (
         select 1
@@ -180,7 +180,7 @@ as $$
       p_search is null
       or p.search_vector @@ websearch_to_tsquery('dutch', p_search)
       or p.search_vector @@ websearch_to_tsquery('english', p_search)
-      or similarity(p.search_text, p_search) > 0.2
+      or word_similarity(p_search, p.search_text) > 0.4
     )
     and not exists (
       select 1
@@ -304,14 +304,14 @@ as $$
     and (
       p.search_vector @@ websearch_to_tsquery('dutch', p_query)
       or p.search_vector @@ websearch_to_tsquery('english', p_query)
-      or similarity(p.search_text, p_query) > 0.15
+      or word_similarity(p_query, p.search_text) > 0.35
       or p.search_text ilike '%' || p_query || '%'
     )
   order by
     greatest(
       ts_rank(p.search_vector, websearch_to_tsquery('dutch', p_query)),
       ts_rank(p.search_vector, websearch_to_tsquery('english', p_query)),
-      similarity(p.search_text, p_query)
+      word_similarity(p_query, p.search_text)
     ) desc
   limit p_limit;
 $$;

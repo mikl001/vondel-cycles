@@ -9,6 +9,7 @@ import {
   CART_COOKIE,
   createGuestCart,
 } from "@/lib/cart/server";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -18,6 +19,9 @@ const UUID_RE =
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "cart", LIMITS.cartMutation))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
   let body: { variantId?: unknown; quantity?: unknown };

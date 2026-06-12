@@ -190,6 +190,13 @@ export async function createOrder(
 
   const adapter = getPaymentAdapter();
 
+  // capture the email on the cart — fuels the abandoned-cart mail when the
+  // customer drops off between here and the payment
+  await supabase
+    .from("carts")
+    .update({ email: input.email.trim().toLowerCase() })
+    .eq("id", cartId);
+
   const { data: order, error } = await supabase
     .from("orders")
     .insert({

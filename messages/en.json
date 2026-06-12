@@ -265,6 +265,12 @@
       "deleted": "Your account has been deleted."
     }
   },
+  "consent": {
+    "title": "Cookies & statistics",
+    "text": "We use anonymous statistics to improve the shop. They only load with your consent (GDPR).",
+    "accept": "That's fine",
+    "decline": "Rather not"
+  },
   "search": {
     "title": "Search results",
     "resultsFor": "Results for \"{query}\"",

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { finalizePayment } from "@/lib/orders/server";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -12,6 +13,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "mock-pay", LIMITS.mockPayment))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
   let body: { orderId?: string; token?: string; outcome?: string };

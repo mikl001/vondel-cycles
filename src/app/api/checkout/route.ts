@@ -6,11 +6,15 @@ import {
   createOrder,
   type CheckoutInput,
 } from "@/lib/orders/server";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "checkout", LIMITS.checkout))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
   const { cartId, userId } = await resolveCartIdentity();
   if (!cartId) {

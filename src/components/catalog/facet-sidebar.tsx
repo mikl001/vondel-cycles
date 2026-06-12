@@ -1,10 +1,10 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+// query-only URL updates: native hooks keep the locale-prefixed path intact
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { usePathname, useRouter } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { lt } from "@/lib/format";
 import type { LocalizedText } from "@/types/catalog";
@@ -38,8 +38,7 @@ export function FacetSidebar({ facets, priceRange, activeCount }: Props) {
     mutate(params);
     params.delete("page"); // filters reset pagination
     startTransition(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      router.replace(`${pathname}?${params.toString()}` as any, { scroll: false });
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     });
   }
 

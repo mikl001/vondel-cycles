@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { CartProvider } from "@/components/cart/cart-provider";
 import { MiniCartDrawer } from "@/components/cart/mini-cart";
+import { ConsentBanner } from "@/components/layout/consent-banner";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getCategoryTree } from "@/lib/catalog/queries";
@@ -26,6 +27,7 @@ export default async function StorefrontLayout({
       </main>
       <SiteFooter />
       <MiniCartDrawer />
+      <ConsentBanner />
     </CartProvider>
   );
 }

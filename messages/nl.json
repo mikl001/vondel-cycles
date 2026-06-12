@@ -265,6 +265,12 @@
       "deleted": "Je account is verwijderd."
     }
   },
+  "consent": {
+    "title": "Cookies & statistieken",
+    "text": "We gebruiken anonieme statistieken om de winkel te verbeteren. Die laden we alleen met jouw toestemming (AVG).",
+    "accept": "Prima",
+    "decline": "Liever niet"
+  },
   "search": {
     "title": "Zoekresultaten",
     "resultsFor": "Resultaten voor \"{query}\"",

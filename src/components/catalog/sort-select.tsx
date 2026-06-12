@@ -1,10 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+// query-only URL updates: native hooks keep the locale-prefixed path intact
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
-
-import { usePathname, useRouter } from "@/i18n/navigation";
 
 const OPTIONS = ["newest", "price_asc", "price_desc", "name"] as const;
 
@@ -28,8 +27,7 @@ export function SortSelect({ withRelevance = false }: { withRelevance?: boolean 
           params.set("sort", e.target.value);
           params.delete("page");
           startTransition(() => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            router.replace(`${pathname}?${params.toString()}` as any, { scroll: false });
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
           });
         }}
         className="rounded-lg border border-vondel-200 bg-white px-2.5 py-1.5"

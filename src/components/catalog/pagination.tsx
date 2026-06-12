@@ -1,9 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-
-import { Link, usePathname } from "@/i18n/navigation";
+import Link from "next/link";
+// query-only links: the native pathname already carries the locale prefix
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function Pagination({ page, pageCount }: { page: number; pageCount: number }) {
   const t = useTranslations("filters.pagination");
@@ -24,8 +24,7 @@ export function Pagination({ page, pageCount }: { page: number; pageCount: numbe
     <nav aria-label={t("page", { page, total: pageCount })} className="mt-8 flex items-center justify-center gap-4">
       {page > 1 ? (
         <Link
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          href={hrefFor(page - 1) as any}
+          href={hrefFor(page - 1)}
           rel="prev"
           className="rounded-lg border border-vondel-200 px-4 py-2 text-sm hover:border-vondel-400"
         >
@@ -39,8 +38,7 @@ export function Pagination({ page, pageCount }: { page: number; pageCount: numbe
       <span className="text-sm text-vondel-600">{t("page", { page, total: pageCount })}</span>
       {page < pageCount ? (
         <Link
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          href={hrefFor(page + 1) as any}
+          href={hrefFor(page + 1)}
           rel="next"
           className="rounded-lg border border-vondel-200 px-4 py-2 text-sm hover:border-vondel-400"
         >

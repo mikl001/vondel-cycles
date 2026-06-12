@@ -37,6 +37,10 @@ yarn-error.log*
 # generated seed images (reproducible via scripts/generate-seed.ts)
 /scripts/.generated/
 
+# playwright
+/test-results/
+/playwright-report/
+
 # vercel
 .vercel
 

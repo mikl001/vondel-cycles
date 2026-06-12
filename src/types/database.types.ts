@@ -101,6 +101,7 @@ export type Database = {
         anon_token: string | null;
         status: string;
         email: string | null;
+        abandoned_notified_at: string | null;
         created_at: string;
         updated_at: string;
       }>;
