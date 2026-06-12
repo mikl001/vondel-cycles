@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
+import { useCart } from "@/components/cart/cart-provider";
 import type { Locale } from "@/i18n/routing";
 import { formatCents, inclBtwCents, lt, productImageUrl } from "@/lib/format";
 import type { ProductDetail, ProductVariant } from "@/types/catalog";
@@ -24,6 +25,7 @@ function buildOptionGroups(variants: ProductVariant[]) {
 export function ProductView({ product }: { product: ProductDetail }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("catalog");
+  const { addToCart, pending } = useCart();
 
   const groups = useMemo(() => buildOptionGroups(product.variants), [product.variants]);
   const [selection, setSelection] = useState<Record<string, string>>(() => {
@@ -206,10 +208,9 @@ export function ProductView({ product }: { product: ProductDetail }) {
 
           <button
             type="button"
-            disabled={!selectedVariant || selectedVariant.stockQuantity === 0}
+            disabled={!selectedVariant || selectedVariant.stockQuantity === 0 || pending}
+            onClick={() => selectedVariant && addToCart(selectedVariant.id)}
             className="rounded-xl bg-vondel-700 px-6 py-3.5 font-semibold text-white transition-colors hover:bg-vondel-600 disabled:cursor-not-allowed disabled:bg-vondel-200"
-            // Cart lands in Phase 4 — the button is wired to the variant already
-            data-variant-id={selectedVariant?.id}
           >
             {t("addToCart")}
           </button>

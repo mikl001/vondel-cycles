@@ -89,6 +89,22 @@
       "page": "Pagina {page} van {total}"
     }
   },
+  "cart": {
+    "title": "Winkelwagen",
+    "empty": "Je winkelwagen is leeg.",
+    "close": "Sluiten",
+    "remove": "Verwijderen",
+    "increase": "Aantal verhogen",
+    "decrease": "Aantal verlagen",
+    "subtotalExcl": "Subtotaal (excl. btw)",
+    "total": "Totaal",
+    "viewCart": "Naar winkelwagen",
+    "checkout": "Afrekenen",
+    "checkoutSoon": "Afrekenen volgt in de volgende fase van deze demo.",
+    "continueShopping": "Verder winkelen",
+    "adjusted": "Het aantal is aangepast aan de beschikbare voorraad.",
+    "addedToCart": "Toegevoegd aan winkelwagen"
+  },
   "search": {
     "title": "Zoekresultaten",
     "resultsFor": "Resultaten voor \"{query}\"",

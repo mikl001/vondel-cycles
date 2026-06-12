@@ -95,6 +95,22 @@ export type Database = {
         related_id: string;
         relation_type: string;
       }>;
+      carts: Table<{
+        id: string;
+        user_id: string | null;
+        anon_token: string | null;
+        status: string;
+        email: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
+      cart_items: Table<{
+        id: string;
+        cart_id: string;
+        variant_id: string;
+        quantity: number;
+        created_at: string;
+      }>;
       reviews: Table<{
         id: string;
         product_id: string;

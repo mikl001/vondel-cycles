@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 
+import { CartButton } from "@/components/cart/mini-cart";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { SearchBox } from "@/components/layout/search-box";
 import { Link } from "@/i18n/navigation";
@@ -63,6 +64,7 @@ export function SiteHeader({ categories }: { categories: CategoryNode[] }) {
 
         <div className="flex shrink-0 items-center gap-3">
           <LocaleSwitcher />
+          <CartButton />
         </div>
       </div>
 

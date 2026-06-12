@@ -245,12 +245,16 @@ function mixWithWhite(hex: string, ratio: number): string {
   return `#${[ch(16), ch(8), ch(0)].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 }
 
+function xmlEsc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function productSvg(p: ProductDef, color: string | null): string {
   const hex = color ? COLOR_HEX[color] : "#346748";
   const bg = mixWithWhite(hex, 0.86);
   const bg2 = mixWithWhite(hex, 0.72);
   const icon = iconFor(p.category).replaceAll("#STROKE", hex);
-  const title = esc(p.name.nl).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const title = xmlEsc(p.name.nl);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
   <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="${bg2}"/>
@@ -258,7 +262,7 @@ function productSvg(p: ProductDef, color: string | null): string {
   <rect width="1200" height="900" fill="url(#g)"/>
   <g transform="translate(400,210) scale(2)">${icon}</g>
   <text x="600" y="710" text-anchor="middle" font-family="Georgia, serif" font-size="52" fill="#1d3728">${title}</text>
-  <text x="600" y="768" text-anchor="middle" font-family="Verdana, sans-serif" font-size="26" letter-spacing="6" fill="#346748">${p.brand.toUpperCase()} — DEMO</text>
+  <text x="600" y="768" text-anchor="middle" font-family="Verdana, sans-serif" font-size="26" letter-spacing="6" fill="#346748">${xmlEsc(p.brand.toUpperCase())} — DEMO</text>
   ${color ? `<circle cx="600" cy="826" r="16" fill="${hex}" stroke="#ffffff" stroke-width="4"/>` : ""}
 </svg>`;
 }

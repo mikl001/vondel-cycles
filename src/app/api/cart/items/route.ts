@@ -1,0 +1,68 @@
+import { randomUUID } from "node:crypto";
+
+import { NextRequest, NextResponse } from "next/server";
+
+import {
+  addItem,
+  buildCartView,
+  CART_COOKIE,
+  createGuestCart,
+  getCartIdByToken,
+} from "@/lib/cart/server";
+import { isSameOrigin } from "@/lib/security";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  let body: { variantId?: unknown; quantity?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const variantId = typeof body.variantId === "string" ? body.variantId : "";
+  const quantity = Number.isInteger(body.quantity) ? (body.quantity as number) : 1;
+  if (!UUID_RE.test(variantId) || quantity < 1 || quantity > 99) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+  }
+
+  try {
+    const supabase = createAdminClient();
+    const existingToken = request.cookies.get(CART_COOKIE)?.value;
+    const token =
+      existingToken && UUID_RE.test(existingToken) ? existingToken : randomUUID();
+
+    let cartId = await getCartIdByToken(supabase, token);
+    cartId ??= await createGuestCart(supabase, token);
+
+    const { adjusted } = await addItem(supabase, cartId, variantId, quantity);
+    const view = await buildCartView(supabase, cartId);
+
+    const response = NextResponse.json(
+      { ...view, adjusted },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+    response.cookies.set(CART_COOKIE, token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 90, // 90 days
+    });
+    return response;
+  } catch (err) {
+    const status = (err as { status?: number }).status ?? 500;
+    if (status === 500) console.error("[cart] POST failed:", err);
+    return NextResponse.json(
+      { error: status === 409 ? "out_of_stock" : "error" },
+      { status },
+    );
+  }
+}

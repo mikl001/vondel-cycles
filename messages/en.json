@@ -89,6 +89,22 @@
       "page": "Page {page} of {total}"
     }
   },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty.",
+    "close": "Close",
+    "remove": "Remove",
+    "increase": "Increase quantity",
+    "decrease": "Decrease quantity",
+    "subtotalExcl": "Subtotal (excl. VAT)",
+    "total": "Total",
+    "viewCart": "View cart",
+    "checkout": "Checkout",
+    "checkoutSoon": "Checkout arrives in the next phase of this demo.",
+    "continueShopping": "Continue shopping",
+    "adjusted": "The quantity was adjusted to the available stock.",
+    "addedToCart": "Added to cart"
+  },
   "search": {
     "title": "Search results",
     "resultsFor": "Results for \"{query}\"",

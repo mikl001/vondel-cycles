@@ -1,5 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 
+import { CartProvider } from "@/components/cart/cart-provider";
+import { MiniCartDrawer } from "@/components/cart/mini-cart";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getCategoryTree } from "@/lib/catalog/queries";
@@ -17,12 +19,13 @@ export default async function StorefrontLayout({
   const categories = await getCategoryTree();
 
   return (
-    <>
+    <CartProvider>
       <SiteHeader categories={categories} />
       <main id="content" className="flex-1">
         {children}
       </main>
       <SiteFooter />
-    </>
+      <MiniCartDrawer />
+    </CartProvider>
   );
 }
