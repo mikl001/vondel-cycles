@@ -212,6 +212,21 @@ export type Database = {
         product_id: string;
         created_at: string;
       }>;
+      user_roles: Table<{
+        user_id: string;
+        role: string;
+        created_at: string;
+      }>;
+      audit_log: Table<{
+        id: string;
+        actor_id: string | null;
+        actor_email: string | null;
+        action: string;
+        entity_type: string;
+        entity_id: string | null;
+        diff: Json | null;
+        created_at: string;
+      }>;
       reviews: Table<{
         id: string;
         product_id: string;
@@ -225,7 +240,27 @@ export type Database = {
         created_at: string;
       }>;
     };
-    Views: Record<string, never>;
+    Views: {
+      admin_sales_per_day: {
+        Row: {
+          day: string;
+          orders: number;
+          revenue_cents: number;
+          avg_order_cents: number;
+        };
+        Relationships: [];
+      };
+      admin_low_stock: {
+        Row: {
+          variant_id: string;
+          sku: string;
+          product_name: Json;
+          stock_quantity: number;
+          low_stock_threshold: number;
+        };
+        Relationships: [];
+      };
+    };
     Functions: {
       filter_products: {
         Args: {

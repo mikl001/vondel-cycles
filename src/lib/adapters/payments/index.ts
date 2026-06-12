@@ -26,6 +26,8 @@ export interface PaymentAdapter {
   ): Promise<{ paymentId: string; checkoutUrl: string }>;
   /** Source of truth for webhooks — never trust the webhook body. */
   getPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+  /** Full refund (admin back-office). No-op for the mock provider. */
+  refundPayment(paymentId: string): Promise<void>;
 }
 
 const MOLLIE_API = "https://api.mollie.com/v2";
@@ -78,6 +80,17 @@ function createMollieAdapter(apiKey: string): PaymentAdapter {
       };
       return map[data.status] ?? "open";
     },
+    async refundPayment(paymentId) {
+      // amount omitted -> full refund of the remaining settled amount
+      const res = await fetch(`${MOLLIE_API}/payments/${paymentId}/refunds`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) {
+        throw new Error(`Mollie refund failed: ${res.status} ${await res.text()}`);
+      }
+    },
   };
 }
 
@@ -94,6 +107,9 @@ function createMockAdapter(): PaymentAdapter {
     },
     async getPaymentStatus() {
       return "open";
+    },
+    async refundPayment() {
+      // demo provider: the order status transition is the whole story
     },
   };
 }
