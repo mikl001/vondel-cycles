@@ -1,0 +1,41 @@
+{
+  "common": {
+    "brand": "Vondel Cycles",
+    "tagline": "Fietsen uit Amsterdam, sinds 1998",
+    "demoDisclaimer": "Demo-webshop voor portfolio-doeleinden — geen echte bestellingen, betalingen of producten.",
+    "skipToContent": "Direct naar inhoud"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Zoeken",
+    "searchPlaceholder": "Zoek fietsen, accessoires…",
+    "cart": "Winkelwagen",
+    "account": "Account",
+    "menu": "Menu",
+    "categories": "Categorieën"
+  },
+  "footer": {
+    "customerService": "Klantenservice",
+    "aboutUs": "Over ons",
+    "contact": "Contact",
+    "shipping": "Verzending & retour",
+    "privacy": "Privacy (AVG)",
+    "terms": "Algemene voorwaarden",
+    "demoKeurmerk": "Demo-keurmerk",
+    "demoKeurmerkNote": "Geen echt keurmerk — ter illustratie",
+    "paymentMethods": "Betaalmethoden",
+    "copyright": "© {year} Vondel Cycles — fictieve demo-webshop"
+  },
+  "home": {
+    "heroTitle": "Jouw fiets, jouw stad",
+    "heroSubtitle": "Stadsfietsen, e-bikes en racefietsen — rechtstreeks uit onze werkplaats aan het Vondelpark.",
+    "heroCta": "Bekijk de collectie",
+    "comingSoon": "Webshop in aanbouw",
+    "comingSoonText": "We sleutelen nog aan de laatste onderdelen. Kom snel terug!"
+  },
+  "locale": {
+    "switchTo": "Switch to English",
+    "nl": "Nederlands",
+    "en": "English"
+  }
+}
