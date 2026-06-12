@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateTotals, lineVatCents } from "@/lib/cart/totals";
+import {
+  calculateOrderTotals,
+  calculateTotals,
+  lineVatCents,
+} from "@/lib/cart/totals";
 
 describe("calculateTotals", () => {
   it("computes a single 21% line", () => {
@@ -41,5 +45,61 @@ describe("calculateTotals", () => {
     expect(totals.vatTotalCents).toBe(0);
     expect(totals.totalInclCents).toBe(0);
     expect(totals.vatBreakdown).toEqual({});
+  });
+});
+
+describe("calculateOrderTotals", () => {
+  const bike = { unitPriceExclCents: 100000, quantity: 1, vatRate: 21 };
+  const book = { unitPriceExclCents: 2000, quantity: 1, vatRate: 9 };
+
+  it("adds shipping at 21%", () => {
+    const t = calculateOrderTotals([bike], { shippingExclCents: 409 });
+    expect(t.shippingVatCents).toBe(86);
+    expect(t.vatBreakdown["21"]).toBe(21000 + 86);
+    expect(t.totalInclCents).toBe(100000 + 409 + 21086);
+  });
+
+  it("allocates a percent discount across rate groups proportionally", () => {
+    const t = calculateOrderTotals([bike, book], {
+      discount: { type: "percent", value: 10 },
+    });
+    expect(t.discountExclCents).toBe(10200);
+    // bases after discount: 21% -> 90000, 9% -> 1800; allocation sums exactly
+    expect(t.vatBreakdown["21"]).toBe(Math.round(90000 * 0.21));
+    expect(t.vatBreakdown["9"]).toBe(Math.round(1800 * 0.09));
+    expect(t.totalInclCents).toBe(
+      102000 - 10200 + t.vatTotalCents,
+    );
+  });
+
+  it("caps a fixed discount at the subtotal", () => {
+    const t = calculateOrderTotals([book], {
+      discount: { type: "fixed", value: 99999 },
+    });
+    expect(t.discountExclCents).toBe(2000);
+    expect(t.totalInclCents).toBe(0);
+  });
+
+  it("zeroes all VAT under reverse charge", () => {
+    const t = calculateOrderTotals([bike, book], {
+      shippingExclCents: 409,
+      reverseCharge: true,
+    });
+    expect(t.vatTotalCents).toBe(0);
+    expect(t.totalInclCents).toBe(102000 + 409);
+  });
+
+  it("discount allocation always sums exactly (largest remainder)", () => {
+    // 3 cents discount over two groups with awkward shares
+    const t = calculateOrderTotals(
+      [
+        { unitPriceExclCents: 100, quantity: 1, vatRate: 21 },
+        { unitPriceExclCents: 200, quantity: 1, vatRate: 9 },
+      ],
+      { discount: { type: "fixed", value: 3 } },
+    );
+    expect(t.discountExclCents).toBe(3);
+    const taxable = 300 - 3;
+    expect(t.totalInclCents - t.vatTotalCents).toBe(taxable);
   });
 });

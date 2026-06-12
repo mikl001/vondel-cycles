@@ -26,6 +26,18 @@ export const routing = defineRouting({
       nl: "/winkelwagen",
       en: "/cart",
     },
+    "/afrekenen": {
+      nl: "/afrekenen",
+      en: "/checkout",
+    },
+    "/bestelling/[orderId]": {
+      nl: "/bestelling/[orderId]",
+      en: "/order/[orderId]",
+    },
+    "/betaling/[orderId]": {
+      nl: "/betaling/[orderId]",
+      en: "/payment/[orderId]",
+    },
   },
 });
 

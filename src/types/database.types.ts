@@ -111,6 +111,78 @@ export type Database = {
         quantity: number;
         created_at: string;
       }>;
+      shipping_methods: Table<{
+        id: string;
+        code: string;
+        name: Json;
+        description: Json | null;
+        price_cents: number;
+        free_above_cents: number | null;
+        supports_pickup: boolean;
+        sort_order: number;
+        active: boolean;
+      }>;
+      promo_codes: Table<{
+        id: string;
+        code: string;
+        discount_type: string;
+        value: number;
+        min_order_cents: number;
+        valid_from: string | null;
+        valid_until: string | null;
+        max_uses: number | null;
+        use_count: number;
+        active: boolean;
+      }>;
+      orders: Table<{
+        id: string;
+        order_number: string;
+        user_id: string | null;
+        cart_id: string | null;
+        email: string;
+        confirmation_token: string;
+        status: string;
+        payment_id: string | null;
+        payment_provider: string;
+        locale: string;
+        customer_type: string;
+        company_name: string | null;
+        vat_number: string | null;
+        reverse_charge: boolean;
+        shipping_address: Json;
+        billing_address: Json;
+        shipping_method_code: string;
+        shipping_cost_cents: number;
+        pickup_point: Json | null;
+        promo_code: string | null;
+        promo_discount_cents: number;
+        subtotal_excl_cents: number;
+        vat_breakdown: Json;
+        total_incl_cents: number;
+        tracking_code: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
+      order_items: Table<{
+        id: string;
+        order_id: string;
+        variant_id: string | null;
+        product_name: Json;
+        product_slug: Json | null;
+        sku: string;
+        options: Json;
+        image_path: string | null;
+        unit_price_excl_cents: number;
+        vat_rate: number;
+        quantity: number;
+      }>;
+      order_events: Table<{
+        id: string;
+        order_id: string;
+        event_type: string;
+        payload: Json | null;
+        created_at: string;
+      }>;
       reviews: Table<{
         id: string;
         product_id: string;
@@ -204,6 +276,14 @@ export type Database = {
       price_incl_cents: {
         Args: { excl: number; vat: number };
         Returns: number;
+      };
+      next_order_number: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
+      decrement_stock: {
+        Args: { p_variant_id: string; p_quantity: number };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;

@@ -122,15 +122,12 @@ export function CartPageContent() {
                 <dd>{formatCents(cart.totals.totalInclCents, locale)}</dd>
               </div>
             </dl>
-            <button
-              type="button"
-              disabled
-              title={t("checkoutSoon")}
-              className="mt-4 w-full cursor-not-allowed rounded-xl bg-vondel-200 px-6 py-3 font-semibold text-white"
+            <Link
+              href="/afrekenen"
+              className="mt-4 block w-full rounded-xl bg-vondel-700 px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-vondel-600"
             >
               {t("checkout")}
-            </button>
-            <p className="mt-2 text-center text-xs text-vondel-400">{t("checkoutSoon")}</p>
+            </Link>
           </aside>
         </div>
       )}
