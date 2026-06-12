@@ -1,5 +1,20 @@
 import { useTranslations } from "next-intl";
 
+import { Link } from "@/i18n/navigation";
+import type { AppPathname } from "@/i18n/routing";
+
+function FooterLink({ pathname, label }: { pathname: AppPathname; label: string }) {
+  return (
+    <Link
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      href={pathname as any}
+      className="transition-colors hover:text-white hover:underline"
+    >
+      {label}
+    </Link>
+  );
+}
+
 export function SiteFooter() {
   const t = useTranslations("footer");
   const year = new Date().getFullYear();
@@ -12,8 +27,12 @@ export function SiteFooter() {
             {t("customerService")}
           </h2>
           <ul className="space-y-2 text-sm">
-            <li>{t("contact")}</li>
-            <li>{t("shipping")}</li>
+            <li>
+              <FooterLink pathname="/contact" label={t("contact")} />
+            </li>
+            <li>
+              <FooterLink pathname="/verzending-en-retour" label={t("shipping")} />
+            </li>
           </ul>
         </div>
         <div>
@@ -21,9 +40,15 @@ export function SiteFooter() {
             Vondel Cycles
           </h2>
           <ul className="space-y-2 text-sm">
-            <li>{t("aboutUs")}</li>
-            <li>{t("privacy")}</li>
-            <li>{t("terms")}</li>
+            <li>
+              <FooterLink pathname="/over-ons" label={t("aboutUs")} />
+            </li>
+            <li>
+              <FooterLink pathname="/privacy" label={t("privacy")} />
+            </li>
+            <li>
+              <FooterLink pathname="/algemene-voorwaarden" label={t("terms")} />
+            </li>
           </ul>
         </div>
         <div>

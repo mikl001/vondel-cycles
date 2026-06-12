@@ -10,6 +10,16 @@ export const routing = defineRouting({
       nl: "/over-ons",
       en: "/about",
     },
+    "/contact": "/contact",
+    "/verzending-en-retour": {
+      nl: "/verzending-en-retour",
+      en: "/shipping-and-returns",
+    },
+    "/privacy": "/privacy",
+    "/algemene-voorwaarden": {
+      nl: "/algemene-voorwaarden",
+      en: "/terms-and-conditions",
+    },
     "/categorie/[...slug]": {
       nl: "/categorie/[...slug]",
       en: "/category/[...slug]",

@@ -32,6 +32,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   withAlternates(() => ({ pathname: "/" }), 1);
 
+  for (const pathname of [
+    "/over-ons",
+    "/contact",
+    "/verzending-en-retour",
+    "/privacy",
+    "/algemene-voorwaarden",
+  ] as const) {
+    withAlternates(() => ({ pathname }), 0.4);
+  }
+
   const walk = (nodes: CategoryNode[], trail: CategoryNode[]) => {
     for (const node of nodes) {
       const path = [...trail, node];
