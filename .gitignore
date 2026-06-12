@@ -41,6 +41,9 @@ yarn-error.log*
 /test-results/
 /playwright-report/
 
+# local credentials (never commit)
+.admin-credentials.local
+
 # vercel
 .vercel
 

@@ -48,6 +48,8 @@ npm run dev
 ```
 
 The back-office lives at `/admin` (login with the make-admin account).
+The default `admin-demo-123` password applies to **local** instances only —
+any deployed environment must use its own rotated password.
 Magic-link and password-reset emails land in Mailpit: http://127.0.0.1:54324.
 
 Useful scripts:
