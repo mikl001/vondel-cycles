@@ -72,5 +72,17 @@ test.describe("storefront critical path", () => {
       timeout: 20_000,
     });
     await expect(page.getByText(/VC-\d{4}-\d{5}/)).toBeVisible();
+
+    // payment idempotency: replaying the finalize must not error or change state
+    const url = new URL(page.url());
+    const orderId = url.pathname.split("/").pop()!;
+    const token = url.searchParams.get("token")!;
+    const replay = await page.request.post("/api/payments/mock", {
+      headers: { Origin: "http://localhost:3000", "content-type": "application/json" },
+      data: { orderId, token, outcome: "paid" },
+    });
+    expect(replay.ok()).toBeTruthy();
+    const status = await page.request.get(`/api/orders/${orderId}?token=${token}`);
+    expect((await status.json()).status).toBe("paid");
   });
 });

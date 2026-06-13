@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
 import { useCart } from "@/components/cart/cart-provider";
+import { inputCls, labelCls } from "@/components/ui/form-classes";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import type { PickupPoint } from "@/lib/adapters/shipping";
@@ -19,10 +20,6 @@ export interface ShippingMethodView {
   freeAboveCents: number | null;
   supportsPickup: boolean;
 }
-
-const inputCls =
-  "w-full rounded-lg border border-vondel-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-vondel-500";
-const labelCls = "mb-1 block text-sm font-medium text-vondel-700";
 
 export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
   const t = useTranslations("checkout");
@@ -267,12 +264,12 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
                 <label htmlFor="postcode" className={labelCls}>{t("postcode")} *</label>
                 <input id="postcode" required autoComplete="postal-code" placeholder="1071 AA"
                   value={address.postcode}
-                  onChange={(e) => setAddress((a) => ({ ...a, postcode: e.target.value }))} className={inputCls} />
+                  onChange={(e) => { setAutofilled(false); setAddress((a) => ({ ...a, postcode: e.target.value })); }} className={inputCls} />
               </div>
               <div>
                 <label htmlFor="houseNumber" className={labelCls}>{t("houseNumber")} *</label>
                 <input id="houseNumber" required value={address.houseNumber}
-                  onChange={(e) => setAddress((a) => ({ ...a, houseNumber: e.target.value }))} className={inputCls} />
+                  onChange={(e) => { setAutofilled(false); setAddress((a) => ({ ...a, houseNumber: e.target.value })); }} className={inputCls} />
               </div>
               <div>
                 <label htmlFor="addition" className={labelCls}>{t("addition")}</label>

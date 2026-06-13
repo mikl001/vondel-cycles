@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs, type Crumb } from "@/components/catalog/breadcrumbs";
 import { FacetSidebar, type FacetGroup } from "@/components/catalog/facet-sidebar";
 import { Pagination } from "@/components/catalog/pagination";
-import { ProductCard } from "@/components/catalog/product-card";
+import { ProductCard, toProductCardData } from "@/components/catalog/product-card";
 import { SortSelect } from "@/components/catalog/sort-select";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -162,19 +162,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <ul className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {result.items.map((p) => (
                 <li key={p.id}>
-                  <ProductCard
-                    product={{
-                      id: p.id,
-                      slug: p.slug as LocalizedText,
-                      name: p.name as LocalizedText,
-                      brand: p.brand,
-                      vatRate: p.vat_rate,
-                      priceInclCents: p.price_incl_cents,
-                      imagePath: p.image_path,
-                      inStock: p.in_stock,
-                      tagSlugs: p.tag_slugs,
-                    }}
-                  />
+                  <ProductCard product={toProductCardData(p)} />
                 </li>
               ))}
             </ul>

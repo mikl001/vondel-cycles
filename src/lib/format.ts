@@ -19,6 +19,11 @@ export function formatCents(cents: number, locale: Locale): string {
   }).format(cents / 100);
 }
 
+/** Locale-agnostic euro formatter for the (English-only) admin back-office. */
+export function formatEur(cents: number): string {
+  return `€ ${(cents / 100).toFixed(2)}`;
+}
+
 /** Public URL for a file in the product-images bucket. */
 export function productImageUrl(storagePath: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${storagePath}`;

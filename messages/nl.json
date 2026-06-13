@@ -12,7 +12,8 @@
     "cart": "Winkelwagen",
     "account": "Account",
     "menu": "Menu",
-    "categories": "Categorieën"
+    "categories": "Categorieën",
+    "breadcrumb": "Kruimelpad"
   },
   "footer": {
     "customerService": "Klantenservice",
@@ -30,8 +31,6 @@
     "heroTitle": "Jouw fiets, jouw stad",
     "heroSubtitle": "Stadsfietsen, e-bikes en racefietsen — rechtstreeks uit onze werkplaats aan het Vondelpark.",
     "heroCta": "Bekijk de collectie",
-    "comingSoon": "Webshop in aanbouw",
-    "comingSoonText": "We sleutelen nog aan de laatste onderdelen. Kom snel terug!",
     "categoriesTitle": "Ontdek onze collectie",
     "featuredTitle": "Bestsellers",
     "usp1": "Gratis verzending vanaf €50",
@@ -49,17 +48,20 @@
     "lowStock": "Nog {count} op voorraad",
     "inclBtw": "incl. {rate}% btw",
     "exclBtw": "excl. btw",
+    "vat": "{rate}% btw",
     "addToCart": "In winkelwagen",
     "chooseOptions": "Kies je uitvoering",
+    "options": {
+      "kleur": "Kleur",
+      "maat": "Maat"
+    },
     "specifications": "Specificaties",
     "description": "Omschrijving",
     "reviews": "Beoordelingen",
     "reviewCount": "{count, plural, =0 {Nog geen beoordelingen} one {# beoordeling} other {# beoordelingen}}",
     "demoReview": "Demo-review",
     "related": "Anderen bekeken ook",
-    "crossSell": "Maak je fiets compleet",
     "products": "{count, plural, =0 {Geen producten} one {# product} other {# producten}}",
-    "showMore": "Toon meer",
     "sku": "Artikelnummer",
     "freeShipping": "Gratis verzending vanaf €50",
     "delivery": "Voor 22:00 besteld, morgen in huis",
@@ -100,10 +102,7 @@
     "total": "Totaal",
     "viewCart": "Naar winkelwagen",
     "checkout": "Afrekenen",
-    "checkoutSoon": "Afrekenen volgt in de volgende fase van deze demo.",
-    "continueShopping": "Verder winkelen",
-    "adjusted": "Het aantal is aangepast aan de beschikbare voorraad.",
-    "addedToCart": "Toegevoegd aan winkelwagen"
+    "continueShopping": "Verder winkelen"
   },
   "checkout": {
     "title": "Afrekenen",
@@ -167,6 +166,13 @@
     "notFound": "Bestelling niet gevonden.",
     "status": "Status",
     "items": "Bestelde artikelen",
+    "subtotal": "Subtotaal (excl. btw)",
+    "discount": "Korting",
+    "shipping": "Verzending (excl. btw)",
+    "free": "Gratis",
+    "vat": "{rate}% btw",
+    "reverseChargeNote": "Btw verlegd (intracommunautaire levering) — 0% btw",
+    "total": "Totaal",
     "deliveryTo": "Bezorging",
     "pickupAt": "Afhaalpunt",
     "backToShop": "Terug naar de winkel"
@@ -207,6 +213,7 @@
     },
     "profile": {
       "title": "Profiel",
+      "phone": "Telefoon",
       "save": "Opslaan",
       "saved": "Opgeslagen",
       "consents": "Voorkeuren & toestemmingen",
@@ -264,6 +271,14 @@
       "deleteConfirm": "Typ VERWIJDER om te bevestigen",
       "deleted": "Je account is verwijderd."
     }
+  },
+  "errors": {
+    "notFoundTitle": "Pagina niet gevonden",
+    "notFoundText": "Deze pagina bestaat niet (meer). Misschien is hij verplaatst of uitverkocht.",
+    "errorTitle": "Er ging iets mis",
+    "errorText": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen",
+    "backHome": "Terug naar de homepage"
   },
   "consent": {
     "title": "Cookies & statistieken",

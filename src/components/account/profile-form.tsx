@@ -3,11 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
+import { inputCls, labelCls } from "@/components/ui/form-classes";
 import { changePassword, updateProfile } from "@/lib/account/actions";
-
-const inputCls =
-  "w-full rounded-lg border border-vondel-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-vondel-500";
-const labelCls = "mb-1 block text-sm font-medium text-vondel-700";
 
 interface Props {
   email: string;
@@ -49,7 +46,7 @@ export function ProfileForm({ email, profile }: Props) {
               <input id="fullName" name="fullName" defaultValue={profile.fullName} className={inputCls} />
             </div>
             <div>
-              <label htmlFor="phone" className={labelCls}>Tel.</label>
+              <label htmlFor="phone" className={labelCls}>{t("phone")}</label>
               <input id="phone" name="phone" defaultValue={profile.phone} className={inputCls} />
             </div>
           </div>

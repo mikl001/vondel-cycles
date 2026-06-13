@@ -1,9 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { ProductCard } from "@/components/catalog/product-card";
+import { ProductCard, toProductCardData } from "@/components/catalog/product-card";
 import { createStaticClient } from "@/lib/supabase/static";
 import { createClient } from "@/lib/supabase/server";
-import type { LocalizedText } from "@/types/catalog";
 
 export default async function WishlistPage({
   params,
@@ -34,19 +33,7 @@ export default async function WishlistPage({
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {cards.map((p) => (
             <li key={p.id}>
-              <ProductCard
-                product={{
-                  id: p.id,
-                  slug: p.slug as LocalizedText,
-                  name: p.name as LocalizedText,
-                  brand: p.brand,
-                  vatRate: p.vat_rate,
-                  priceInclCents: p.price_incl_cents,
-                  imagePath: p.image_path,
-                  inStock: p.in_stock,
-                  tagSlugs: p.tag_slugs,
-                }}
-              />
+              <ProductCard product={toProductCardData(p)} />
             </li>
           ))}
         </ul>

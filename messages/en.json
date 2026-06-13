@@ -12,7 +12,8 @@
     "cart": "Cart",
     "account": "Account",
     "menu": "Menu",
-    "categories": "Categories"
+    "categories": "Categories",
+    "breadcrumb": "Breadcrumb"
   },
   "footer": {
     "customerService": "Customer service",
@@ -30,8 +31,6 @@
     "heroTitle": "Your bike, your city",
     "heroSubtitle": "City bikes, e-bikes and road bikes — straight from our workshop next to the Vondelpark.",
     "heroCta": "Browse the collection",
-    "comingSoon": "Webshop under construction",
-    "comingSoonText": "We're still tightening the last bolts. Check back soon!",
     "categoriesTitle": "Discover the collection",
     "featuredTitle": "Bestsellers",
     "usp1": "Free shipping from €50",
@@ -49,17 +48,20 @@
     "lowStock": "Only {count} left",
     "inclBtw": "incl. {rate}% VAT",
     "exclBtw": "excl. VAT",
+    "vat": "{rate}% VAT",
     "addToCart": "Add to cart",
     "chooseOptions": "Choose your options",
+    "options": {
+      "kleur": "Colour",
+      "maat": "Size"
+    },
     "specifications": "Specifications",
     "description": "Description",
     "reviews": "Reviews",
     "reviewCount": "{count, plural, =0 {No reviews yet} one {# review} other {# reviews}}",
     "demoReview": "Demo review",
     "related": "Others also viewed",
-    "crossSell": "Complete your bike",
     "products": "{count, plural, =0 {No products} one {# product} other {# products}}",
-    "showMore": "Show more",
     "sku": "Item number",
     "freeShipping": "Free shipping from €50",
     "delivery": "Order before 22:00, delivered tomorrow",
@@ -100,10 +102,7 @@
     "total": "Total",
     "viewCart": "View cart",
     "checkout": "Checkout",
-    "checkoutSoon": "Checkout arrives in the next phase of this demo.",
-    "continueShopping": "Continue shopping",
-    "adjusted": "The quantity was adjusted to the available stock.",
-    "addedToCart": "Added to cart"
+    "continueShopping": "Continue shopping"
   },
   "checkout": {
     "title": "Checkout",
@@ -167,6 +166,13 @@
     "notFound": "Order not found.",
     "status": "Status",
     "items": "Ordered items",
+    "subtotal": "Subtotal (excl. VAT)",
+    "discount": "Discount",
+    "shipping": "Shipping (excl. VAT)",
+    "free": "Free",
+    "vat": "{rate}% VAT",
+    "reverseChargeNote": "VAT reverse-charged (intra-EU supply) — 0% VAT",
+    "total": "Total",
     "deliveryTo": "Delivery",
     "pickupAt": "Pickup point",
     "backToShop": "Back to the shop"
@@ -207,6 +213,7 @@
     },
     "profile": {
       "title": "Profile",
+      "phone": "Phone",
       "save": "Save",
       "saved": "Saved",
       "consents": "Preferences & consents",
@@ -264,6 +271,14 @@
       "deleteConfirm": "Type DELETE to confirm",
       "deleted": "Your account has been deleted."
     }
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "This page doesn't exist (anymore). It may have moved or sold out.",
+    "errorTitle": "Something went wrong",
+    "errorText": "An unexpected error occurred. Please try again.",
+    "retry": "Try again",
+    "backHome": "Back to the homepage"
   },
   "consent": {
     "title": "Cookies & statistics",

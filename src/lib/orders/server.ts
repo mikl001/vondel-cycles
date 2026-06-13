@@ -277,8 +277,11 @@ export async function createOrder(
 
 /**
  * Idempotent payment finalizer, shared by the Mollie webhook and the demo
- * payment page. The unique (order_id, event_type) constraint guarantees each
- * transition runs once even under duplicate/out-of-order webhook delivery.
+ * payment page. The state transition (event + order status + stock + cart +
+ * promo) runs inside a single Postgres transaction via finalize_order, so it
+ * is all-or-nothing — a crash can never strand the order half-applied, and
+ * concurrent paid checkouts for the last unit can't both succeed (the loser
+ * returns outcome='oversold' and is refunded here).
  */
 export async function finalizePayment(
   orderId: string,
@@ -287,101 +290,59 @@ export async function finalizePayment(
   if (status === "open") return { applied: false };
   const supabase = createAdminClient();
 
-  const { error: eventError } = await supabase
-    .from("order_events")
-    .insert({ order_id: orderId, event_type: `payment_${status}` });
-  if (eventError) {
-    // 23505 = unique violation -> this transition was already processed
-    if ((eventError as { code?: string }).code === "23505") {
-      return { applied: false };
-    }
-    throw eventError;
-  }
-
-  const { data: order, error } = await supabase
-    .from("orders")
-    .select("*, order_items (*)")
-    .eq("id", orderId)
-    .single();
+  const paid = status === "paid";
+  const failedStatus = status === "canceled" ? "cancelled" : status;
+  const { data, error } = await supabase.rpc("finalize_order", {
+    p_order_id: orderId,
+    p_paid: paid,
+    p_failed_status: failedStatus,
+  });
   if (error) throw error;
-  if (order.status !== "pending") return { applied: false };
 
-  if (status !== "paid") {
-    const mapped = status === "canceled" ? "cancelled" : status;
-    await supabase.from("orders").update({ status: mapped }).eq("id", orderId);
+  const result = data?.[0];
+  if (!result?.applied) return { applied: false };
+
+  // paid but unfulfillable (lost the stock race): refund and mark refunded
+  if (result.outcome === "oversold") {
+    try {
+      const { data: ord } = await supabase
+        .from("orders")
+        .select("payment_id")
+        .eq("id", orderId)
+        .maybeSingle();
+      if (ord?.payment_id) await getPaymentAdapter().refundPayment(ord.payment_id);
+    } catch (err) {
+      console.error("[finalize] oversold refund failed:", err);
+    }
+    await supabase.from("orders").update({ status: "refunded" }).eq("id", orderId);
     return { applied: true };
   }
 
-  // paid: decrement stock (shortages are logged, not blocking — a real shop
-  // would trigger a refund/backorder flow here)
-  for (const item of order.order_items as unknown as {
-    variant_id: string | null;
-    quantity: number;
-    sku: string;
-  }[]) {
-    if (!item.variant_id) continue;
-    const { data: ok } = await supabase.rpc("decrement_stock", {
-      p_variant_id: item.variant_id,
-      p_quantity: item.quantity,
-    });
-    if (!ok) {
-      await supabase.from("order_events").insert({
-        order_id: orderId,
-        event_type: `stock_shortage_${item.sku}`,
-        payload: { sku: item.sku, quantity: item.quantity } as unknown as Json,
-      });
-    }
+  if (result.outcome === "paid" && result.email) {
+    const locale = (result.locale === "en" ? "en" : "nl") as "nl" | "en";
+    const lines = ((result.order_lines as { product_name: Json; quantity: number }[]) ?? [])
+      .map((i) => `  ${i.quantity}x ${lt(i.product_name as never, locale)}`)
+      .join("\n");
+    await getEmailAdapter()
+      .send({
+        to: result.email,
+        subject:
+          locale === "nl"
+            ? `Bevestiging bestelling ${result.order_number} (demo)`
+            : `Order confirmation ${result.order_number} (demo)`,
+        text:
+          (locale === "nl"
+            ? `Bedankt voor je demo-bestelling bij Vondel Cycles!\n\n`
+            : `Thanks for your demo order at Vondel Cycles!\n\n`) +
+          `${lines}\n\n` +
+          absoluteUrl(locale, {
+            pathname: "/bestelling/[orderId]",
+            params: { orderId },
+          }) +
+          `?token=${result.confirmation_token}`,
+      })
+      .catch((err) => console.error("[email] confirmation failed:", err));
   }
-
-  await supabase.from("orders").update({ status: "paid" }).eq("id", orderId);
-
-  if (order.cart_id) {
-    await supabase
-      .from("carts")
-      .update({ status: "converted" })
-      .eq("id", order.cart_id);
-  }
-
-  if (order.promo_code) {
-    const { data: promo } = await supabase
-      .from("promo_codes")
-      .select("id, use_count")
-      .eq("code", order.promo_code)
-      .maybeSingle();
-    if (promo) {
-      await supabase
-        .from("promo_codes")
-        .update({ use_count: promo.use_count + 1 })
-        .eq("id", promo.id);
-    }
-  }
-
-  const locale = (order.locale === "en" ? "en" : "nl") as "nl" | "en";
-  const lines = (order.order_items as unknown as {
-    product_name: Json;
-    quantity: number;
-  }[])
-    .map((i) => `  ${i.quantity}x ${lt(i.product_name as never, locale)}`)
-    .join("\n");
-  await getEmailAdapter()
-    .send({
-      to: order.email,
-      subject:
-        locale === "nl"
-          ? `Bevestiging bestelling ${order.order_number} (demo)`
-          : `Order confirmation ${order.order_number} (demo)`,
-      text:
-        (locale === "nl"
-          ? `Bedankt voor je demo-bestelling bij Vondel Cycles!\n\n`
-          : `Thanks for your demo order at Vondel Cycles!\n\n`) +
-        `${lines}\n\nTotaal / Total: €${(order.total_incl_cents / 100).toFixed(2)}\n` +
-        absoluteUrl(locale, {
-          pathname: "/bestelling/[orderId]",
-          params: { orderId: order.id },
-        }) +
-        `?token=${order.confirmation_token}`,
-    })
-    .catch((err) => console.error("[email] confirmation failed:", err));
 
   return { applied: true };
 }

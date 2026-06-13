@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -12,6 +13,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "account", LIMITS.account))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
   const supabase = await createClient();

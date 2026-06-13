@@ -4,7 +4,9 @@ import {
   calculateOrderTotals,
   calculateTotals,
   lineVatCents,
+  unitVatCents,
 } from "@/lib/cart/totals";
+import { inclBtwCents } from "@/lib/format";
 
 describe("calculateTotals", () => {
   it("computes a single 21% line", () => {
@@ -16,27 +18,39 @@ describe("calculateTotals", () => {
     expect(totals.totalInclCents).toBe(24200);
   });
 
-  it("splits the VAT breakdown across mixed rates", () => {
+  it("splits the VAT breakdown across mixed rates (unit-rounded)", () => {
     // a bike (21%) and two books (9%)
     const totals = calculateTotals([
       { unitPriceExclCents: 45372, quantity: 1, vatRate: 21 },
       { unitPriceExclCents: 2293, quantity: 2, vatRate: 9 },
     ]);
     expect(totals.subtotalExclCents).toBe(45372 + 4586);
-    expect(totals.vatBreakdown["21"]).toBe(Math.round(45372 * 0.21));
-    expect(totals.vatBreakdown["9"]).toBe(Math.round(4586 * 0.09));
+    expect(totals.vatBreakdown["21"]).toBe(unitVatCents(45372, 21));
+    // unit-rounded: 2 × round(2293 × 0.09), NOT round(4586 × 0.09)
+    expect(totals.vatBreakdown["9"]).toBe(2 * unitVatCents(2293, 9));
     expect(totals.totalInclCents).toBe(
       totals.subtotalExclCents + totals.vatTotalCents,
     );
   });
 
-  it("rounds VAT per line, not per unit", () => {
-    // 3 × 33 cents = 99 excl; 21% of 99 = 20.79 -> 21 (per line)
-    // per-unit rounding would give 3 × round(6.93) = 21 too, so pick a case
-    // where they differ: unit 5 cents, qty 3 -> line 15, vat 3.15 -> 3;
-    // per-unit: 3 × round(1.05) = 3. Use 7 cents qty 3 -> line 21 -> 4.41 -> 4
-    // per-unit: 3 × round(1.47) = 3 × 1 = 3 — differs.
-    expect(lineVatCents({ unitPriceExclCents: 7, quantity: 3, vatRate: 21 })).toBe(4);
+  it("rounds VAT per unit then multiplies by quantity", () => {
+    // unit 7 cents, qty 3: per-unit 3 × round(1.47)=3 × 1 = 3
+    // (line-rounding would give round(21 × 0.21)=round(4.41)=4 — we use per-unit)
+    expect(lineVatCents({ unitPriceExclCents: 7, quantity: 3, vatRate: 21 })).toBe(3);
+  });
+
+  it("keeps line totals reconciling: unitIncl × qty sums exactly to the total", () => {
+    const items = [
+      { unitPriceExclCents: 45372, quantity: 1, vatRate: 21 },
+      { unitPriceExclCents: 57769, quantity: 3, vatRate: 21 },
+      { unitPriceExclCents: 2293, quantity: 2, vatRate: 9 },
+    ];
+    const totals = calculateTotals(items);
+    const sumOfLines = items.reduce(
+      (sum, i) => sum + inclBtwCents(i.unitPriceExclCents, i.vatRate) * i.quantity,
+      0,
+    );
+    expect(sumOfLines).toBe(totals.totalInclCents);
   });
 
   it("handles an empty cart", () => {
@@ -45,6 +59,36 @@ describe("calculateTotals", () => {
     expect(totals.vatTotalCents).toBe(0);
     expect(totals.totalInclCents).toBe(0);
     expect(totals.vatBreakdown).toEqual({});
+  });
+});
+
+describe("cart preview and charged order agree to the cent", () => {
+  // The headline invariant: with no shipping/discount, the cart total
+  // (calculateTotals) must equal the order total (calculateOrderTotals).
+  const cases = [
+    // the two default 21% seed bikes — the exact regression from review round 1
+    [
+      { unitPriceExclCents: 45372, quantity: 1, vatRate: 21 },
+      { unitPriceExclCents: 57769, quantity: 1, vatRate: 21 },
+    ],
+    // quantities > 1 at the same rate, where line-rounding would have drifted
+    [
+      { unitPriceExclCents: 2293, quantity: 3, vatRate: 9 },
+      { unitPriceExclCents: 2293, quantity: 2, vatRate: 9 },
+    ],
+    // mixed rates and quantities
+    [
+      { unitPriceExclCents: 45372, quantity: 2, vatRate: 21 },
+      { unitPriceExclCents: 1653, quantity: 4, vatRate: 9 },
+      { unitPriceExclCents: 57769, quantity: 1, vatRate: 21 },
+    ],
+  ];
+
+  it.each(cases)("matches for case %#", (...items) => {
+    const cart = calculateTotals(items);
+    const order = calculateOrderTotals(items, {});
+    expect(order.totalInclCents).toBe(cart.totalInclCents);
+    expect(order.vatBreakdown).toEqual(cart.vatBreakdown);
   });
 });
 
@@ -67,9 +111,7 @@ describe("calculateOrderTotals", () => {
     // bases after discount: 21% -> 90000, 9% -> 1800; allocation sums exactly
     expect(t.vatBreakdown["21"]).toBe(Math.round(90000 * 0.21));
     expect(t.vatBreakdown["9"]).toBe(Math.round(1800 * 0.09));
-    expect(t.totalInclCents).toBe(
-      102000 - 10200 + t.vatTotalCents,
-    );
+    expect(t.totalInclCents).toBe(102000 - 10200 + t.vatTotalCents);
   });
 
   it("caps a fixed discount at the subtotal", () => {

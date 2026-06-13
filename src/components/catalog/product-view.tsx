@@ -23,6 +23,9 @@ function buildOptionGroups(variants: ProductVariant[]) {
   return groups;
 }
 
+/** The variant option key whose value also selects the product image. */
+const COLOUR_OPTION_KEY = "kleur";
+
 export function ProductView({ product }: { product: ProductDetail }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("catalog");
@@ -51,16 +54,16 @@ export function ProductView({ product }: { product: ProductDetail }) {
 
   // Show the image matching the selected colour when there is one
   const [imageIndex, setImageIndex] = useState(0);
+  const selectedColour = selection[COLOUR_OPTION_KEY];
   const activeImageIndex = useMemo(() => {
-    const color = selection.kleur;
-    if (color) {
+    if (selectedColour) {
       const idx = product.images.findIndex((img) =>
-        img.storagePath.includes(`/${color}.`),
+        img.storagePath.includes(`/${selectedColour}.`),
       );
       if (idx >= 0) return idx;
     }
     return imageIndex;
-  }, [selection.kleur, product.images, imageIndex]);
+  }, [selectedColour, product.images, imageIndex]);
 
   const activeImage = product.images[activeImageIndex] ?? product.images[0];
 
@@ -102,8 +105,8 @@ export function ProductView({ product }: { product: ProductDetail }) {
                   // selecting a thumb of another colour also switches the colour
                   const m = img.storagePath.match(/\/([^/]+)\.\w+$/);
                   const color = m?.[1];
-                  if (color && groups.get("kleur")?.some((o) => o.value === color)) {
-                    setSelection((s) => ({ ...s, kleur: color }));
+                  if (color && groups.get(COLOUR_OPTION_KEY)?.some((o) => o.value === color)) {
+                    setSelection((s) => ({ ...s, [COLOUR_OPTION_KEY]: color }));
                   }
                 }}
                 aria-label={lt(img.alt, locale)}
@@ -152,14 +155,8 @@ export function ProductView({ product }: { product: ProductDetail }) {
             <legend className="sr-only">{t("chooseOptions")}</legend>
             {[...groups.entries()].map(([key, options]) => (
               <div key={key}>
-                <p className="mb-2 text-sm font-medium capitalize text-vondel-700">
-                  {key === "kleur"
-                    ? locale === "nl"
-                      ? "Kleur"
-                      : "Colour"
-                    : locale === "nl"
-                      ? "Maat"
-                      : "Size"}
+                <p className="mb-2 text-sm font-medium text-vondel-700">
+                  {t.has(`options.${key}`) ? t(`options.${key}`) : key}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {options.map((opt) => {

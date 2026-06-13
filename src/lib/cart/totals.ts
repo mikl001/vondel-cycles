@@ -2,8 +2,13 @@
  * Single source of truth for money math. Used by the cart API, checkout,
  * invoices and admin alike — the client never computes authoritative totals.
  *
- * Convention: prices are stored as integer cents EXCLUDING BTW; VAT is
- * computed and rounded per line (half-up), then summed per rate.
+ * Convention: prices are stored as integer cents EXCLUDING BTW. VAT is rounded
+ * once PER UNIT and then multiplied by the quantity. This is deliberate: the
+ * inclusive unit price the customer sees is round(excl * (1 + rate/100)), so
+ * rounding the VAT per unit guarantees `unitIncl * quantity === lineIncl` and,
+ * crucially, that the cart preview (calculateTotals) and the order that is
+ * actually charged (calculateOrderTotals) agree to the cent — "what you see is
+ * what you pay". The two functions therefore MUST share this unit-VAT basis.
  */
 
 export interface PricedItem {
@@ -25,8 +30,13 @@ export function lineExclCents(item: PricedItem): number {
   return item.unitPriceExclCents * item.quantity;
 }
 
+/** VAT for the unit, rounded once, then scaled by quantity. */
+export function unitVatCents(unitPriceExclCents: number, vatRate: number): number {
+  return Math.round((unitPriceExclCents * vatRate) / 100);
+}
+
 export function lineVatCents(item: PricedItem): number {
-  return Math.round((lineExclCents(item) * item.vatRate) / 100);
+  return unitVatCents(item.unitPriceExclCents, item.vatRate) * item.quantity;
 }
 
 export function calculateTotals(items: PricedItem[]): CartTotals {
@@ -81,12 +91,18 @@ export function calculateOrderTotals(
   const shippingExclCents = opts.shippingExclCents ?? 0;
   const reverseCharge = opts.reverseCharge ?? false;
 
-  // taxable base per rate, before discount
+  // taxable base per rate and the unit-rounded product VAT per rate (the same
+  // basis calculateTotals uses, so an undiscounted order matches the cart view)
   const baseByRate = new Map<number, number>();
+  const productVatByRate = new Map<number, number>();
   for (const item of items) {
     baseByRate.set(
       item.vatRate,
       (baseByRate.get(item.vatRate) ?? 0) + lineExclCents(item),
+    );
+    productVatByRate.set(
+      item.vatRate,
+      (productVatByRate.get(item.vatRate) ?? 0) + lineVatCents(item),
     );
   }
   const subtotalExclCents = [...baseByRate.values()].reduce((a, b) => a + b, 0);
@@ -125,8 +141,16 @@ export function calculateOrderTotals(
 
   const vatBreakdown: Record<string, number> = {};
   for (const rate of rates) {
-    const base = baseByRate.get(rate)! - (allocated.get(rate) ?? 0);
-    const vat = reverseCharge ? 0 : Math.round((base * rate) / 100);
+    const alloc = allocated.get(rate) ?? 0;
+    const base = baseByRate.get(rate)! - alloc;
+    // With no discount on this rate, reuse the unit-rounded product VAT so the
+    // order matches the cart exactly; a discount falls back to rounding once on
+    // the reduced base (only ever shown via this same function, so consistent).
+    const vat = reverseCharge
+      ? 0
+      : alloc === 0
+        ? productVatByRate.get(rate)!
+        : Math.round((base * rate) / 100);
     if (vat > 0 || base > 0) vatBreakdown[String(rate)] = vat;
   }
 

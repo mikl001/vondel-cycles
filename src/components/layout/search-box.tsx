@@ -23,8 +23,11 @@ export function SearchBox() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
+  // -1 = the typed query itself (no option highlighted)
+  const [activeIndex, setActiveIndex] = useState(-1);
   const boxRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const listId = "search-suggestions";
 
   useEffect(() => {
     const q = query.trim();
@@ -43,6 +46,7 @@ export function SearchBox() {
         );
         if (res.ok) {
           setSuggestions(await res.json());
+          setActiveIndex(-1);
           setOpen(true);
         }
       } catch {
@@ -60,12 +64,35 @@ export function SearchBox() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  function submit() {
+  function goToQuery() {
     const q = query.trim();
     if (!q) return;
     setOpen(false);
     router.push({ pathname: "/zoeken", query: { q } });
   }
+
+  function goToSuggestion(s: Suggestion) {
+    setOpen(false);
+    router.push({ pathname: "/product/[slug]", params: { slug: s.slug } });
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (!open || suggestions.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      e.preventDefault();
+      goToSuggestion(suggestions[activeIndex]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }
+
+  const showList = open && suggestions.length > 0;
 
   return (
     <div ref={boxRef} className="relative w-full max-w-md">
@@ -73,14 +100,22 @@ export function SearchBox() {
         role="search"
         onSubmit={(e) => {
           e.preventDefault();
-          submit();
+          goToQuery();
         }}
       >
         <input
-          type="search"
+          type="text"
+          role="combobox"
+          aria-expanded={showList}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={
+            activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined
+          }
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => suggestions.length && setOpen(true)}
+          onKeyDown={onKeyDown}
           placeholder={t("placeholder")}
           aria-label={t("placeholder")}
           className="w-full rounded-full border border-vondel-200 bg-white px-4 py-2 pr-10 text-sm outline-none transition-colors focus:border-vondel-500"
@@ -97,17 +132,28 @@ export function SearchBox() {
         </button>
       </form>
 
-      {open && suggestions.length > 0 && (
+      {showList && (
         <ul
+          id={listId}
+          role="listbox"
           aria-label={t("suggestionsLabel")}
           className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-vondel-100 bg-white shadow-lg"
         >
-          {suggestions.map((s) => (
-            <li key={s.product_id}>
+          {suggestions.map((s, i) => (
+            <li
+              key={s.product_id}
+              id={`${listId}-${i}`}
+              role="option"
+              aria-selected={i === activeIndex}
+            >
               <Link
                 href={{ pathname: "/product/[slug]", params: { slug: s.slug } }}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-vondel-50"
+                onMouseEnter={() => setActiveIndex(i)}
+                tabIndex={-1}
+                className={`flex items-center gap-3 px-3 py-2 text-sm ${
+                  i === activeIndex ? "bg-vondel-50" : ""
+                }`}
               >
                 {s.image_path && (
                   <span className="relative h-9 w-12 shrink-0 overflow-hidden rounded">

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
+import { inputCls, labelCls } from "@/components/ui/form-classes";
 import { deleteAddress, saveAddress, setDefaultAddress } from "@/lib/account/actions";
 
 export interface AddressView {
@@ -17,10 +18,6 @@ export interface AddressView {
   city: string;
   isDefault: boolean;
 }
-
-const inputCls =
-  "w-full rounded-lg border border-vondel-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-vondel-500";
-const labelCls = "mb-1 block text-sm font-medium text-vondel-700";
 
 function AddressForm({
   address,

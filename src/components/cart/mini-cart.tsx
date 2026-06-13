@@ -8,6 +8,7 @@ import { useCart } from "@/components/cart/cart-provider";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { formatCents, lt, productImageUrl } from "@/lib/format";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 
 export function CartButton() {
   const t = useTranslations("cart");
@@ -39,6 +40,7 @@ export function MiniCartDrawer() {
   const tc = useTranslations("catalog");
   const locale = useLocale() as Locale;
   const { cart, drawerOpen, setDrawerOpen, updateQuantity, removeItem } = useCart();
+  const trapRef = useFocusTrap<HTMLElement>(drawerOpen);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -58,7 +60,7 @@ export function MiniCartDrawer() {
         onClick={() => setDrawerOpen(false)}
         className="absolute inset-0 bg-vondel-950/40"
       />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-xl">
+      <aside ref={trapRef} className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-xl">
         <header className="flex items-center justify-between border-b border-vondel-100 px-5 py-4">
           <h2 className="text-lg font-semibold text-vondel-900">
             {t("title")} ({cart.itemCount})
@@ -151,7 +153,7 @@ export function MiniCartDrawer() {
               <dl className="mb-3 flex flex-col gap-1 text-sm">
                 {Object.entries(cart.totals.vatBreakdown).map(([rate, cents]) => (
                   <div key={rate} className="flex justify-between text-vondel-500">
-                    <dt>{tc("inclBtw", { rate })}</dt>
+                    <dt>{tc("vat", { rate })}</dt>
                     <dd>{formatCents(cents, locale)}</dd>
                   </div>
                 ))}

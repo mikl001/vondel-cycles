@@ -122,14 +122,18 @@ export async function mergeGuestCartIntoUserCart(
 
   const userCartId = await getCartIdByUser(supabase, userId);
   if (!userCartId) {
+    // Adopt the guest cart. If a concurrent request (parallel login tab, or an
+    // add-to-cart) created the user's active cart in the meantime, the partial
+    // unique index rejects this with 23505 — fall through to the merge path.
     const { error } = await supabase
       .from("carts")
       .update({ user_id: userId, anon_token: null })
       .eq("id", guestCartId);
-    if (error) throw error;
-    return;
+    if (!error) return;
+    if ((error as { code?: string }).code !== "23505") throw error;
   }
 
+  const targetCartId = userCartId ?? (await getOrCreateUserCart(supabase, userId));
   const { data: guestItems, error } = await supabase
     .from("cart_items")
     .select("variant_id, quantity")
@@ -137,7 +141,7 @@ export async function mergeGuestCartIntoUserCart(
   if (error) throw error;
 
   for (const item of guestItems) {
-    await addItem(supabase, userCartId, item.variant_id, item.quantity).catch(
+    await addItem(supabase, targetCartId, item.variant_id, item.quantity).catch(
       () => {}, // out-of-stock guest leftovers are dropped silently
     );
   }

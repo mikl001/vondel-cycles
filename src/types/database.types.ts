@@ -350,6 +350,22 @@ export type Database = {
         Args: { p_variant_id: string; p_quantity: number };
         Returns: boolean;
       };
+      finalize_order: {
+        Args: { p_order_id: string; p_paid: boolean; p_failed_status?: string };
+        Returns: {
+          applied: boolean;
+          outcome: string;
+          order_number: string | null;
+          email: string | null;
+          locale: string | null;
+          confirmation_token: string | null;
+          order_lines: Json | null;
+        }[];
+      };
+      product_review_summary: {
+        Args: { p_product_id: string };
+        Returns: { review_count: number; average: number }[];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

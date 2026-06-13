@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { Suspense } from "react";
 
 import { CartButton } from "@/components/cart/mini-cart";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
@@ -63,7 +64,13 @@ export function SiteHeader({ categories }: { categories: CategoryNode[] }) {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <LocaleSwitcher />
+          {/* useSearchParams in the switcher needs a Suspense boundary so the
+              statically-prerendered pages (cart, etc.) don't bail out of CSR */}
+          <Suspense
+            fallback={<div className="h-7 w-16 rounded-full border border-vondel-200" />}
+          >
+            <LocaleSwitcher />
+          </Suspense>
           <Link
             href="/account"
             aria-label={t("nav.account")}

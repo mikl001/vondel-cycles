@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const rawNext = searchParams.get("next") ?? "/nl/account";
-  // only allow same-site relative redirects
-  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/nl";
+  // Only allow same-site relative redirects. Require a single leading slash
+  // followed by a non-slash/non-backslash char: this rejects "//evil.com" AND
+  // "/\evil.com" (WHATWG treats the backslash as an authority separator, so a
+  // naive startsWith("//") guard would let it through as an open redirect).
+  const next = /^\/[^/\\]/.test(rawNext) ? rawNext : "/nl";
 
   if (tokenHash && type) {
     const supabase = await createClient();

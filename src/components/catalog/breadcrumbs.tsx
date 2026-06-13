@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Fragment } from "react";
 
 import { Link } from "@/i18n/navigation";
@@ -9,12 +12,13 @@ export interface Crumb {
 }
 
 export function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
+  const t = useTranslations("nav");
   return (
-    <nav aria-label="Breadcrumb" className="text-sm text-vondel-500">
+    <nav aria-label={t("breadcrumb")} className="text-sm text-vondel-500">
       <ol className="flex flex-wrap items-center gap-1.5">
         <li>
           <Link href="/" className="hover:text-vondel-700 hover:underline">
-            Home
+            {t("home")}
           </Link>
         </li>
         {crumbs.map((crumb, i) => (

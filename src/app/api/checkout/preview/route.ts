@@ -6,6 +6,7 @@ import {
   priceCheckout,
   qualifiesForReverseCharge,
 } from "@/lib/orders/server";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -13,6 +14,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "preview", LIMITS.preview))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
   const { cartId } = await resolveCartIdentity();
   if (!cartId) {

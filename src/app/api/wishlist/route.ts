@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 import { createClient } from "@/lib/supabase/server";
 
@@ -22,6 +23,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "wishlist", LIMITS.wishlist))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
   const supabase = await createClient();
   const {

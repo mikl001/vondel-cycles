@@ -145,12 +145,16 @@ export function InvoiceDocument({
               <Text>{eur(subtotalAfterDiscount + order.shippingCostCents)}</Text>
             </View>
           )}
-          {Object.entries(order.vatBreakdown).map(([rate, cents]) => (
-            <View key={rate} style={styles.totalRow}>
-              <Text>{nl ? `Btw ${rate}%` : `VAT ${rate}%`}</Text>
-              <Text>{eur(cents)}</Text>
-            </View>
-          ))}
+          {Object.entries(order.vatBreakdown)
+            // under reverse charge VAT is 0 — the notice below carries it, so
+            // suppress the redundant 'VAT 21% EUR 0,00' rows
+            .filter(([, cents]) => !order.reverseCharge && cents > 0)
+            .map(([rate, cents]) => (
+              <View key={rate} style={styles.totalRow}>
+                <Text>{nl ? `Btw ${rate}%` : `VAT ${rate}%`}</Text>
+                <Text>{eur(cents)}</Text>
+              </View>
+            ))}
           {order.reverseCharge && (
             <View style={styles.totalRow}>
               <Text>

@@ -113,7 +113,7 @@ export function CartPageContent() {
               </div>
               {Object.entries(cart.totals.vatBreakdown).map(([rate, cents]) => (
                 <div key={rate} className="flex justify-between text-vondel-500">
-                  <dt>{rate}% btw</dt>
+                  <dt>{tc("vat", { rate })}</dt>
                   <dd>{formatCents(cents, locale)}</dd>
                 </div>
               ))}

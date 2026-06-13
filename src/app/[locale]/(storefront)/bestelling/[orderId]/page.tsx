@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+import { CartRefreshOnMount } from "@/components/cart/cart-refresh-on-mount";
 import { ConfirmationPoller } from "@/components/checkout/confirmation-status";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -38,6 +39,8 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       {pendingPayment && <ConfirmationPoller orderId={order.id} token={token} />}
+      {/* cart converted on payment — resync the header badge */}
+      {!pendingPayment && <CartRefreshOnMount />}
 
       <div className="mb-8 text-center">
         {pendingPayment ? (
@@ -95,20 +98,36 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
           ))}
         </ul>
         <dl className="flex flex-col gap-1 border-t border-vondel-100 px-5 py-4 text-sm">
+          <div className="flex justify-between text-vondel-600">
+            <dt>{t("subtotal")}</dt>
+            <dd>{formatCents(order.subtotalExclCents, locale)}</dd>
+          </div>
           {order.promoDiscountCents > 0 && (
             <div className="flex justify-between text-vondel-600">
-              <dt>{locale === "nl" ? "Korting" : "Discount"}</dt>
+              <dt>{t("discount")}</dt>
               <dd>−{formatCents(order.promoDiscountCents, locale)}</dd>
             </div>
           )}
-          {Object.entries(order.vatBreakdown).map(([rate, cents]) => (
-            <div key={rate} className="flex justify-between text-vondel-500">
-              <dt>{rate}% btw</dt>
-              <dd>{formatCents(cents, locale)}</dd>
+          {order.shippingCostCents > 0 && (
+            <div className="flex justify-between text-vondel-600">
+              <dt>{t("shipping")}</dt>
+              <dd>{formatCents(order.shippingCostCents, locale)}</dd>
             </div>
-          ))}
+          )}
+          {Object.entries(order.vatBreakdown)
+            // under reverse charge the per-rate VAT is 0 — show the note, not 0,00 rows
+            .filter(([, cents]) => !order.reverseCharge && cents > 0)
+            .map(([rate, cents]) => (
+              <div key={rate} className="flex justify-between text-vondel-500">
+                <dt>{t("vat", { rate })}</dt>
+                <dd>{formatCents(cents, locale)}</dd>
+              </div>
+            ))}
+          {order.reverseCharge && (
+            <p className="text-xs text-vondel-500">{t("reverseChargeNote")}</p>
+          )}
           <div className="mt-1 flex justify-between border-t border-vondel-100 pt-2 text-base font-semibold text-vondel-900">
-            <dt>{locale === "nl" ? "Totaal" : "Total"}</dt>
+            <dt>{t("total")}</dt>
             <dd>{formatCents(order.totalInclCents, locale)}</dd>
           </div>
         </dl>

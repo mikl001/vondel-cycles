@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState } from "react";
 
+import { buttonCls, inputCls, labelCls } from "@/components/ui/form-classes";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import {
@@ -12,12 +13,6 @@ import {
   signUp,
   type AuthState,
 } from "@/lib/auth/actions";
-
-const inputCls =
-  "w-full rounded-lg border border-vondel-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-vondel-500";
-const labelCls = "mb-1 block text-sm font-medium text-vondel-700";
-const buttonCls =
-  "w-full rounded-xl bg-vondel-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-vondel-600 disabled:bg-vondel-200";
 
 function AuthError({ state }: { state: AuthState }) {
   const t = useTranslations("auth");

@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs, type Crumb } from "@/components/catalog/breadcrumbs";
-import { ProductCard } from "@/components/catalog/product-card";
+import { ProductCard, toProductCardData } from "@/components/catalog/product-card";
 import { ProductView } from "@/components/catalog/product-view";
 import { StarRating } from "@/components/catalog/star-rating";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -17,9 +17,13 @@ import {
 } from "@/lib/catalog/queries";
 import { lt, productImageUrl } from "@/lib/format";
 import { absoluteUrl, breadcrumbJsonLd, languageAlternates, productJsonLd } from "@/lib/seo";
-import type { CategoryNode, LocalizedText } from "@/types/catalog";
+import type { CategoryNode } from "@/types/catalog";
 
-export const revalidate = 300;
+// Short ISR window: the page is SEO-statically generated, but stock badges /
+// the add-to-cart enabled state must not stay frozen for long on a
+// stock-sensitive page. (Oversell is still impossible — checkout revalidates
+// and finalize_order decrements atomically.)
+export const revalidate = 60;
 export const dynamicParams = true;
 
 interface Props {
@@ -204,19 +208,7 @@ export default async function ProductPage({ params }: Props) {
           <ul className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {related.slice(0, 4).map((p) => (
               <li key={p.id}>
-                <ProductCard
-                  product={{
-                    id: p.id,
-                    slug: p.slug as LocalizedText,
-                    name: p.name as LocalizedText,
-                    brand: p.brand,
-                    vatRate: p.vat_rate,
-                    priceInclCents: p.price_incl_cents,
-                    imagePath: p.image_path,
-                    inStock: p.in_stock,
-                    tagSlugs: p.tag_slugs,
-                  }}
-                />
+                <ProductCard product={toProductCardData(p)} />
               </li>
             ))}
           </ul>

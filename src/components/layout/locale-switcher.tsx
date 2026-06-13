@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import { routing, type Locale } from "@/i18n/routing";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -12,13 +12,16 @@ export function LocaleSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
 
   function switchTo(next: Locale) {
     if (next === locale) return;
+    // carry over the query string (search term, active filters, sort, page)
+    const query = Object.fromEntries(searchParams.entries());
     router.replace(
       // @ts-expect-error -- pathname and params always match for the
       // current route, so the compile-time pairing check can be skipped.
-      { pathname, params },
+      { pathname, params, query },
       { locale: next },
     );
   }

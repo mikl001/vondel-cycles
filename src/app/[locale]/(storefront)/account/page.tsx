@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ProfileForm } from "@/components/account/profile-form";
+import { CartRefreshOnMount } from "@/components/cart/cart-refresh-on-mount";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AccountOverviewPage({
@@ -23,6 +24,8 @@ export default async function AccountOverviewPage({
 
   return (
     <div className="flex flex-col gap-6">
+      {/* a guest cart may have just merged into this account on login */}
+      <CartRefreshOnMount />
       <p className="text-vondel-600">
         {t("welcome")}, {profile?.full_name || user!.email} 👋
       </p>

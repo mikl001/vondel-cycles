@@ -90,8 +90,12 @@ export async function rateLimit(
 
 export const LIMITS = {
   checkout: { limit: 10, windowMs: 60_000 },
+  preview: { limit: 40, windowMs: 60_000 },
   cartMutation: { limit: 60, windowMs: 60_000 },
   postcode: { limit: 30, windowMs: 60_000 },
+  pickup: { limit: 30, windowMs: 60_000 },
   suggest: { limit: 60, windowMs: 60_000 },
   mockPayment: { limit: 20, windowMs: 60_000 },
+  wishlist: { limit: 60, windowMs: 60_000 },
+  account: { limit: 10, windowMs: 60_000 },
 } as const;

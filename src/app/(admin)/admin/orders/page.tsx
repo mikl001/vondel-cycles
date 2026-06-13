@@ -1,7 +1,6 @@
 import { OrderRowActions } from "@/components/admin/order-row-actions";
+import { formatEur as eur } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-const eur = (cents: number) => `€ ${(cents / 100).toFixed(2)}`;
 
 export default async function AdminOrdersPage() {
   const admin = createAdminClient();

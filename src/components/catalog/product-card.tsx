@@ -18,6 +18,34 @@ export interface ProductCardData {
   tagSlugs: string[];
 }
 
+/** Shape returned by the filter_products / product_cards RPCs (snake_case). */
+interface ProductCardRowLike {
+  id: string;
+  slug: unknown;
+  name: unknown;
+  brand: string;
+  vat_rate: number;
+  price_incl_cents: number;
+  image_path: string | null;
+  in_stock: boolean;
+  tag_slugs: string[];
+}
+
+/** Map a raw catalog RPC row to the card props (was duplicated across 5 pages). */
+export function toProductCardData(row: ProductCardRowLike): ProductCardData {
+  return {
+    id: row.id,
+    slug: row.slug as LocalizedText,
+    name: row.name as LocalizedText,
+    brand: row.brand,
+    vatRate: row.vat_rate,
+    priceInclCents: row.price_incl_cents,
+    imagePath: row.image_path,
+    inStock: row.in_stock,
+    tagSlugs: row.tag_slugs,
+  };
+}
+
 const TAG_LABELS: Record<string, LocalizedText> = {
   bestseller: { nl: "Bestseller", en: "Bestseller" },
   nieuw: { nl: "Nieuw", en: "New" },

@@ -1,12 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 /**
  * AVG/GDPR data portability: everything we store about the user as JSON.
  * All queries run RLS-scoped through the user's own session.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!(await rateLimit(request, "account", LIMITS.account))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
   const supabase = await createClient();
   const {
     data: { user },
