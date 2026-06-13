@@ -9,7 +9,9 @@ const CONSENT_COOKIE = "vc_consent";
 type Consent = "accepted" | "declined" | null;
 
 function readConsent(): Consent {
-  const match = document.cookie.match(/(?:^|;\s*)vc_consent=(accepted|declined)/);
+  const match = document.cookie.match(
+    new RegExp(`(?:^|;\\s*)${CONSENT_COOKIE}=(accepted|declined)`),
+  );
   return (match?.[1] as Consent) ?? null;
 }
 

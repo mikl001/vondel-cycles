@@ -55,9 +55,9 @@ export default async function AdminDashboardPage() {
               {(sales ?? []).map((day) => (
                 <tr key={day.day}>
                   <td className="px-4 py-2">{day.day}</td>
-                  <td className="px-4 py-2 text-right">{day.orders}</td>
-                  <td className="px-4 py-2 text-right">{eur(day.revenue_cents)}</td>
-                  <td className="px-4 py-2 text-right">{eur(day.avg_order_cents)}</td>
+                  <td className="px-4 py-2 text-right">{Number(day.orders)}</td>
+                  <td className="px-4 py-2 text-right">{eur(Number(day.revenue_cents))}</td>
+                  <td className="px-4 py-2 text-right">{eur(Number(day.avg_order_cents))}</td>
                 </tr>
               ))}
               {!sales?.length && (

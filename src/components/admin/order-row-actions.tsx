@@ -3,13 +3,7 @@
 import { useState, useTransition } from "react";
 
 import { setTrackingCode, updateOrderStatus } from "@/lib/admin/actions";
-
-const TRANSITIONS: Record<string, string[]> = {
-  paid: ["processing", "cancelled", "refunded"],
-  processing: ["shipped", "cancelled", "refunded"],
-  shipped: ["delivered", "refunded"],
-  delivered: ["refunded"],
-};
+import { ORDER_TRANSITIONS } from "@/lib/orders/transitions";
 
 const STATUS_COLORS: Record<string, string> = {
   paid: "bg-vondel-100 text-vondel-800",
@@ -33,7 +27,7 @@ export function OrderRowActions({
 }) {
   const [tracking, setTracking] = useState(trackingCode);
   const [pending, startTransition] = useTransition();
-  const options = TRANSITIONS[status] ?? [];
+  const options = ORDER_TRANSITIONS[status] ?? [];
 
   return (
     <>

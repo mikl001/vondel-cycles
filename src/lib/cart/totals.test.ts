@@ -122,6 +122,15 @@ describe("calculateOrderTotals", () => {
     expect(t.totalInclCents).toBe(0);
   });
 
+  it("caps a percent discount > 100 at the subtotal (never negative)", () => {
+    const t = calculateOrderTotals([book], {
+      discount: { type: "percent", value: 250 },
+    });
+    expect(t.discountExclCents).toBe(2000);
+    expect(t.totalInclCents).toBe(0);
+    expect(t.totalInclCents).toBeGreaterThanOrEqual(0);
+  });
+
   it("zeroes all VAT under reverse charge", () => {
     const t = calculateOrderTotals([bike, book], {
       shippingExclCents: 409,

@@ -137,6 +137,11 @@ export function SearchBox() {
         </button>
       </form>
 
+      {/* announce how many suggestions are available to screen readers */}
+      <div role="status" className="sr-only">
+        {showList ? t("suggestionsCount", { count: suggestions.length }) : ""}
+      </div>
+
       {showList && (
         <ul
           id={listId}

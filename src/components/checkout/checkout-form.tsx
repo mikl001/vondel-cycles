@@ -24,6 +24,7 @@ export interface ShippingMethodView {
 
 export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
   const t = useTranslations("checkout");
+  const tCart = useTranslations("cart");
   const locale = useLocale() as Locale;
   const { cart, pending } = useCart();
 
@@ -165,7 +166,7 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
           href="/"
           className="mt-4 inline-block rounded-xl bg-vondel-700 px-6 py-2.5 font-medium text-white hover:bg-vondel-600"
         >
-          Vondel Cycles
+          {tCart("continueShopping")}
         </Link>
       </div>
     );

@@ -288,6 +288,7 @@
     "resultsFor": "Resultaten voor \"{query}\"",
     "noResults": "Niets gevonden voor \"{query}\". Probeer een andere zoekterm.",
     "placeholder": "Zoek fietsen, accessoires…",
-    "suggestionsLabel": "Suggesties"
+    "suggestionsLabel": "Suggesties",
+    "suggestionsCount": "{count, plural, =0 {Geen suggesties} one {# suggestie beschikbaar} other {# suggesties beschikbaar}}"
   }
 }

@@ -1,4 +1,11 @@
-// One-off helper: list message keys with no apparent reference in src.
+// Dev helper: list message keys with no apparent reference in src.
+//
+// HEURISTIC, not a rigorous gate: a key is treated as "alive" if its LEAF
+// segment appears as a token boundary anywhere in concatenated src, and whole
+// dynamic groups (statuses/options/errors/sort/pagination) are skipped because
+// they are read via t(`group.${x}`). So a genuinely-dead key whose leaf happens
+// to collide with unrelated code (save/total/free/vat) can be a false negative.
+// Use it to surface candidates, then confirm each by hand before deleting.
 import fs from "node:fs";
 
 const en = JSON.parse(fs.readFileSync("messages/en.json", "utf8"));

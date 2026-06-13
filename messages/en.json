@@ -288,6 +288,7 @@
     "resultsFor": "Results for \"{query}\"",
     "noResults": "Nothing found for \"{query}\". Try a different search term.",
     "placeholder": "Search bikes, accessories…",
-    "suggestionsLabel": "Suggestions"
+    "suggestionsLabel": "Suggestions",
+    "suggestionsCount": "{count, plural, =0 {No suggestions} one {# suggestion available} other {# suggestions available}}"
   }
 }

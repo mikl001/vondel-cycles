@@ -16,11 +16,14 @@ export async function GET(request: NextRequest) {
   }
 
   const admin = createAdminClient();
-  // orders flagged refund_failed that have not yet been refunded
+  // orders flagged refund_failed that have not yet been refunded — oldest first
+  // so genuinely-stuck orders drain before newer ones (the marker is deleted on
+  // success below, so resolved rows don't accumulate against the budget)
   const { data: failed, error } = await admin
     .from("order_events")
     .select("order_id")
     .eq("event_type", "refund_failed")
+    .order("created_at", { ascending: true })
     .limit(200);
   if (error) {
     console.error("[retry-refunds] query failed:", error);
@@ -57,6 +60,12 @@ export async function GET(request: NextRequest) {
         .from("order_events")
         .insert({ order_id: order.id, event_type: "refunded" })
         .then(undefined, () => {});
+      // clear the marker so this resolved order stops consuming the sweep budget
+      await admin
+        .from("order_events")
+        .delete()
+        .eq("order_id", order.id)
+        .eq("event_type", "refund_failed");
       recovered++;
     } catch (err) {
       console.error(`[retry-refunds] still failing for ${order.id}:`, err);

@@ -2,6 +2,10 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 
+import { ipFromHeaders } from "@/lib/client-ip";
+
+export { ipFromHeaders };
+
 /**
  * Sliding-window rate limiter. Uses Upstash Redis when configured (required
  * in production — Vercel runs many instances, in-memory state won't hold);
@@ -61,26 +65,6 @@ async function upstashLimit(
 
 export function clientIp(request: NextRequest): string {
   return ipFromHeaders(request.headers);
-}
-
-/**
- * IP extraction from a bare Headers object — usable from Server Actions too.
- *
- * Assumes a single trusted proxy (Vercel). The platform sets `x-real-ip` to the
- * true client and APPENDS the real client to `x-forwarded-for`, so we must NOT
- * trust the LEFTMOST x-forwarded-for value — a client can prefix its own
- * spoofed entry there to evade per-IP limits. Prefer x-real-ip, then the
- * RIGHTMOST x-forwarded-for hop (the one the trusted proxy appended).
- */
-export function ipFromHeaders(headers: Headers): string {
-  const realIp = headers.get("x-real-ip")?.trim();
-  if (realIp) return realIp;
-  const xff = headers.get("x-forwarded-for");
-  if (xff) {
-    const parts = xff.split(",").map((s) => s.trim()).filter(Boolean);
-    if (parts.length) return parts[parts.length - 1];
-  }
-  return "unknown";
 }
 
 /**

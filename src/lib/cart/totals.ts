@@ -107,13 +107,15 @@ export function calculateOrderTotals(
   }
   const subtotalExclCents = [...baseByRate.values()].reduce((a, b) => a + b, 0);
 
-  // discount, capped at the product subtotal
+  // discount, capped at the product subtotal so neither a fixed amount nor a
+  // mis-entered percent > 100 can ever drive the order total negative
   let discountExclCents = 0;
   if (opts.discount && subtotalExclCents > 0) {
-    discountExclCents =
+    const raw =
       opts.discount.type === "percent"
         ? Math.round((subtotalExclCents * opts.discount.value) / 100)
-        : Math.min(opts.discount.value, subtotalExclCents);
+        : opts.discount.value;
+    discountExclCents = Math.min(raw, subtotalExclCents);
   }
 
   // allocate the discount across rate groups (largest remainder)

@@ -173,7 +173,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return (
     <CartContext.Provider value={value}>
       {children}
-      <div role="status" aria-live="polite" className="sr-only">
+      {/* role=status already implies a polite, atomic live region */}
+      <div role="status" className="sr-only">
         {announce}
       </div>
     </CartContext.Provider>
