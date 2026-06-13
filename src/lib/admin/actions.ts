@@ -83,6 +83,16 @@ export async function updateOrderStatus(
     .select("id");
   if (err2) throw err2;
   if (!updated?.length) throw new Error("stale_status");
+  // an operator finishing a stuck oversold refund clears the marker too, so the
+  // order drains from the retry-refunds sweep budget exactly like a cron-
+  // resolved one (harmless no-op when there is no marker)
+  if (status === "refunded") {
+    await admin
+      .from("order_events")
+      .delete()
+      .eq("order_id", orderId)
+      .eq("event_type", "refund_failed");
+  }
   await admin.from("order_events").insert({
     order_id: orderId,
     event_type: `status_${status}`,
