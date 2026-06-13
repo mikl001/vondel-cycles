@@ -22,7 +22,7 @@ export async function GET() {
 /** Toggle a product. RLS pins the row to auth.uid(). */
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   if (!(await rateLimit(request, "wishlist", LIMITS.wishlist))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });

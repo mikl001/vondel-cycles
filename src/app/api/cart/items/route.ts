@@ -18,7 +18,7 @@ const UUID_RE =
 
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   if (!(await rateLimit(request, "cart", LIMITS.cartMutation))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
@@ -28,13 +28,13 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_json" }, { status: 400 });
   }
 
   const variantId = typeof body.variantId === "string" ? body.variantId : "";
   const quantity = Number.isInteger(body.quantity) ? (body.quantity as number) : 1;
   if (!UUID_RE.test(variantId) || quantity < 1 || quantity > 99) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
 
   try {

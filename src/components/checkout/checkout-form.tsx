@@ -289,7 +289,7 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
             </div>
           </div>
           {autofilled && (
-            <p className="mt-2 text-xs font-medium text-vondel-600">✓ {t("addressFound")}</p>
+            <p role="status" className="mt-2 text-xs font-medium text-vondel-600">✓ {t("addressFound")}</p>
           )}
         </section>
 
@@ -385,9 +385,9 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
             {t("promoApply")}
           </button>
         </div>
-        {promoError && <p className="mb-3 text-xs text-red-600">{t("promoInvalid")}</p>}
+        {promoError && <p role="alert" className="mb-3 text-xs text-red-600">{t("promoInvalid")}</p>}
         {promoCode && totals && totals.discountExclCents > 0 && (
-          <p className="mb-3 text-xs font-medium text-vondel-600">
+          <p role="status" className="mb-3 text-xs font-medium text-vondel-600">
             ✓ {t("promoApplied")}: {promoCode}
           </p>
         )}
@@ -412,12 +412,15 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
                   : formatCents(totals.shippingExclCents, locale)}
               </dd>
             </div>
-            {Object.entries(totals.vatBreakdown).map(([rate, cents]) => (
-              <div key={rate} className="flex justify-between text-vondel-500">
-                <dt>{t("vat", { rate })}</dt>
-                <dd>{formatCents(cents, locale)}</dd>
-              </div>
-            ))}
+            {Object.entries(totals.vatBreakdown)
+              // under reverse charge VAT is 0 — the note carries it, no 0,00 rows
+              .filter(([, cents]) => !totals.reverseCharge && cents > 0)
+              .map(([rate, cents]) => (
+                <div key={rate} className="flex justify-between text-vondel-500">
+                  <dt>{t("vat", { rate })}</dt>
+                  <dd>{formatCents(cents, locale)}</dd>
+                </div>
+              ))}
             {totals.reverseCharge && (
               <p className="text-xs text-vondel-500">{t("reverseChargeNote")}</p>
             )}
@@ -429,7 +432,7 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
         )}
 
         {error && (
-          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
             {t(`errors.${error}` as never)}
           </p>
         )}

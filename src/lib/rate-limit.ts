@@ -98,4 +98,5 @@ export const LIMITS = {
   mockPayment: { limit: 20, windowMs: 60_000 },
   wishlist: { limit: 60, windowMs: 60_000 },
   account: { limit: 10, windowMs: 60_000 },
+  invoice: { limit: 20, windowMs: 60_000 },
 } as const;

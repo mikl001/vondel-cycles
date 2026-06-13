@@ -48,7 +48,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
     group.values.push({
       slug: row.value_slug,
       label: row.value_label as LocalizedText,
-      count: row.product_count,
+      count: Number(row.product_count),
     });
   }
 

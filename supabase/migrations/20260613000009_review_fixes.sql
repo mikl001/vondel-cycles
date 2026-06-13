@@ -61,12 +61,15 @@ begin
     return;
   end if;
 
-  -- paid: lock the variant rows so a concurrent finalize serializes behind us
-  perform 1 from public.product_variants v
+  -- paid: lock the variant rows so a concurrent finalize serializes behind us.
+  -- ORDER BY id gives every order a consistent lock-acquisition order, so two
+  -- orders sharing >1 variant cannot deadlock against each other.
+  perform v.id from public.product_variants v
   where v.id in (
     select variant_id from public.order_items
     where order_id = p_order_id and variant_id is not null
   )
+  order by v.id
   for update;
 
   select coalesce(bool_and(v.stock_quantity >= oi.quantity), true)
@@ -109,7 +112,7 @@ begin
     (
       select jsonb_agg(
         jsonb_build_object('product_name', oi.product_name, 'quantity', oi.quantity)
-        order by oi.id
+        order by oi.sku
       )
       from public.order_items oi where oi.order_id = p_order_id
     );

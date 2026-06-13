@@ -78,9 +78,11 @@ Useful scripts:
   and the admin role rides in the JWT via a custom access token hook.
   Verified adversarially (cross-user reads return zero rows; forged
   user_id inserts are rejected).
-- **Money math** lives in one tested module (`lib/cart/totals.ts`): per-line
-  VAT rounding, promo discounts allocated across VAT-rate groups by largest
-  remainder, shipping at 21%, intra-EU reverse charge.
+- **Money math** lives in one tested module (`lib/cart/totals.ts`): VAT is
+  rounded **per unit** (then ×quantity) on a single shared basis, so the cart
+  preview, checkout and the charged order agree to the cent and per-line totals
+  reconcile exactly. Promo discounts are allocated across VAT-rate groups by
+  largest remainder; shipping at 21%; intra-EU reverse charge zeroes VAT.
 - **Payments** are an adapter: a local demo-payment page stands in for
   Mollie's hosted checkout; setting `MOLLIE_API_KEY` switches to the real
   (test-mode) iDEAL flow — webhook handler and refunds included. The webhook

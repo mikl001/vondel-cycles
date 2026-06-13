@@ -102,7 +102,9 @@
     "total": "Total",
     "viewCart": "View cart",
     "checkout": "Checkout",
-    "continueShopping": "Continue shopping"
+    "continueShopping": "Continue shopping",
+    "addedToCart": "Added to cart",
+    "adjusted": "Quantity adjusted to the available stock"
   },
   "checkout": {
     "title": "Checkout",

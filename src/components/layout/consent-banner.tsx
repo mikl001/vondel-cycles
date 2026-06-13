@@ -46,7 +46,9 @@ export function ConsentBanner() {
 
       {consent === null && (
         <div
-          role="dialog"
+          // a persistent, non-blocking bottom bar — a complementary region,
+          // not a modal dialog (so it must not trap focus)
+          role="region"
           aria-label={t("title")}
           className="fixed inset-x-0 bottom-0 z-50 border-t border-vondel-200 bg-white p-4 shadow-lg"
         >

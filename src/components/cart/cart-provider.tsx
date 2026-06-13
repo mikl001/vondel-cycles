@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   createContext,
   useCallback,
@@ -33,9 +34,12 @@ export function useCart(): CartContextValue {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("cart");
   const [cart, setCart] = useState<CartView>(EMPTY_CART);
   const [pending, setPending] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // screen-reader announcement for cart changes (rendered in a live region)
+  const [announce, setAnnounce] = useState("");
   // serialize mutations so optimistic state never races the server response
   const queue = useRef<Promise<unknown>>(Promise.resolve());
 
@@ -97,10 +101,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({ variantId, quantity }),
         }),
       );
-      if (view) setDrawerOpen(true);
+      if (view) {
+        setDrawerOpen(true);
+        // the add endpoint augments the cart view with an `adjusted` flag
+        const adjusted = (view as CartView & { adjusted?: boolean }).adjusted;
+        // include the new count so consecutive identical adds still change the
+        // live-region text and get re-announced
+        setAnnounce(
+          `${adjusted ? t("adjusted") : t("addedToCart")} (${view.itemCount})`,
+        );
+      }
       return view !== null;
     },
-    [mutate],
+    [mutate, t],
   );
 
   const updateQuantity = useCallback(
@@ -153,5 +166,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [cart, pending, drawerOpen, addToCart, updateQuantity, removeItem],
   );
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      <div role="status" aria-live="polite" className="sr-only">
+        {announce}
+      </div>
+    </CartContext.Provider>
+  );
 }

@@ -30,6 +30,7 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
   if (!token) notFound();
 
   const t = await getTranslations("confirmation");
+  const tStatus = await getTranslations("account.orders.statuses");
   const order = await getOrderForConfirmation(orderId, token).catch(() => null);
   if (!order) notFound();
 
@@ -71,7 +72,8 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
           </>
         )}
         <p className="mt-3 text-sm text-vondel-400">
-          {t("title", { orderNumber: order.orderNumber })} · {t("status")}: {order.status}
+          {t("title", { orderNumber: order.orderNumber })} · {t("status")}:{" "}
+          {tStatus(order.status)}
         </p>
       </div>
 
@@ -91,8 +93,10 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
                 {item.quantity}× {lt(item.productName as LocalizedText, locale)}
                 <span className="block text-xs text-vondel-400">{item.sku}</span>
               </span>
+              {/* excl-VAT line totals so the items foot to the excl subtotal +
+                  VAT = total (and to the excl total under reverse charge) */}
               <span className="text-sm font-medium text-vondel-900">
-                {formatCents(item.unitPriceInclCents * item.quantity, locale)}
+                {formatCents(item.unitPriceExclCents * item.quantity, locale)}
               </span>
             </li>
           ))}

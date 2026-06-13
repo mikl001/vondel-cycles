@@ -12,27 +12,27 @@ type Context = { params: Promise<{ itemId: string }> };
 
 export async function PATCH(request: NextRequest, { params }: Context) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   const { itemId } = await params;
   if (!UUID_RE.test(itemId)) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
 
   let body: { quantity?: unknown };
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_json" }, { status: 400 });
   }
   const quantity = Number.isInteger(body.quantity) ? (body.quantity as number) : NaN;
   if (!(quantity >= 1 && quantity <= 99)) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
 
   try {
     const { cartId } = await resolveCartIdentity();
-    if (!cartId) return NextResponse.json({ error: "No cart" }, { status: 404 });
+    if (!cartId) return NextResponse.json({ error: "no_cart" }, { status: 404 });
     const supabase = createAdminClient();
     const { adjusted } = await setItemQuantity(supabase, cartId, itemId, quantity);
     const view = await buildCartView(supabase, cartId);
@@ -49,16 +49,16 @@ export async function PATCH(request: NextRequest, { params }: Context) {
 
 export async function DELETE(request: NextRequest, { params }: Context) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   const { itemId } = await params;
   if (!UUID_RE.test(itemId)) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
 
   try {
     const { cartId } = await resolveCartIdentity();
-    if (!cartId) return NextResponse.json({ error: "No cart" }, { status: 404 });
+    if (!cartId) return NextResponse.json({ error: "no_cart" }, { status: 404 });
     const supabase = createAdminClient();
     await removeItem(supabase, cartId, itemId);
     const view = await buildCartView(supabase, cartId);

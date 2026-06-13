@@ -131,7 +131,9 @@ export async function listProducts(
       p_offset: (page - 1) * pageSize,
     });
     if (error) throw error;
-    const total = data[0]?.total_count ?? 0;
+    // total_count is a Postgres bigint — coerce so it's a real number, not a
+    // string that would break === comparisons / Math on the caller side
+    const total = Number(data[0]?.total_count ?? 0);
     return { items: data, total, page, pageCount: Math.ceil(total / pageSize) };
   });
 }

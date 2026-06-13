@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { InvoiceDocument } from "@/lib/invoices/invoice-document";
 import { getOrderForConfirmation } from "@/lib/orders/server";
+import { LIMITS, rateLimit } from "@/lib/rate-limit";
 
 // @react-pdf/renderer needs Node APIs — never run this on the edge runtime
 export const runtime = "nodejs";
@@ -16,6 +17,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> },
 ) {
+  // PDF rendering is CPU-heavy — throttle to blunt DoS amplification
+  if (!(await rateLimit(request, "invoice", LIMITS.invoice))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
   const { orderId } = await params;
   const token = request.nextUrl.searchParams.get("token") ?? "";
   if (!UUID_RE.test(orderId) || !UUID_RE.test(token)) {

@@ -11,7 +11,7 @@ import { isSameOrigin } from "@/lib/security";
 
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   if (!(await rateLimit(request, "checkout", LIMITS.checkout))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });

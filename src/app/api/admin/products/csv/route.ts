@@ -7,7 +7,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 const HEADER = "sku,product_name_nl,status,base_price_excl_cents,variant_price_excl_cents,stock_quantity";
 
 function csvEscape(value: string): string {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  // Neutralize CSV formula injection: a cell beginning with = + - @ (or a
+  // leading tab/CR) is treated as a formula by spreadsheet apps. Prefix with a
+  // single quote so the value is rendered as literal text.
+  const guarded = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  return /[",\n]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded;
 }
 
 /** Variant-level product export. */

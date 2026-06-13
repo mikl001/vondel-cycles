@@ -102,7 +102,9 @@
     "total": "Totaal",
     "viewCart": "Naar winkelwagen",
     "checkout": "Afrekenen",
-    "continueShopping": "Verder winkelen"
+    "continueShopping": "Verder winkelen",
+    "addedToCart": "Toegevoegd aan winkelwagen",
+    "adjusted": "Aantal aangepast aan de beschikbare voorraad"
   },
   "checkout": {
     "title": "Afrekenen",

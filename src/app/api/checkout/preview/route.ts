@@ -13,7 +13,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 /** Server-priced totals for the checkout summary (same path as the order). */
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   if (!(await rateLimit(request, "preview", LIMITS.preview))) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });

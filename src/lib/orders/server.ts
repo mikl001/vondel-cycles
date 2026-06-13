@@ -302,7 +302,13 @@ export async function finalizePayment(
   const result = data?.[0];
   if (!result?.applied) return { applied: false };
 
-  // paid but unfulfillable (lost the stock race): refund and mark refunded
+  // Paid but unfulfillable (lost the stock race). finalize_order already
+  // committed status='cancelled' + a durable 'oversold' event inside the
+  // transaction, so the intent survives a crash here. Attempt the refund and
+  // ONLY advance to 'refunded' when it actually succeeds; on failure leave the
+  // order 'cancelled' and log a 'refund_failed' event so a reconciliation sweep
+  // (querying oversold-without-refund orders) can retry. We never claim a
+  // refund we did not make.
   if (result.outcome === "oversold") {
     try {
       const { data: ord } = await supabase
@@ -310,11 +316,21 @@ export async function finalizePayment(
         .select("payment_id")
         .eq("id", orderId)
         .maybeSingle();
-      if (ord?.payment_id) await getPaymentAdapter().refundPayment(ord.payment_id);
+      if (ord?.payment_id) {
+        await getPaymentAdapter().refundPayment(ord.payment_id);
+        await supabase.from("orders").update({ status: "refunded" }).eq("id", orderId);
+        await supabase
+          .from("order_events")
+          .insert({ order_id: orderId, event_type: "refunded" })
+          .then(undefined, () => {});
+      }
     } catch (err) {
       console.error("[finalize] oversold refund failed:", err);
+      await supabase
+        .from("order_events")
+        .insert({ order_id: orderId, event_type: "refund_failed" })
+        .then(undefined, () => {});
     }
-    await supabase.from("orders").update({ status: "refunded" }).eq("id", orderId);
     return { applied: true };
   }
 
