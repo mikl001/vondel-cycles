@@ -11,6 +11,9 @@ const ORDER_TRANSITIONS: Record<string, string[]> = {
   processing: ["shipped", "cancelled", "refunded"],
   shipped: ["delivered", "refunded"],
   delivered: ["refunded"],
+  // an oversold order is auto-cancelled; let an operator finish the refund if
+  // the automatic refund failed (updateOrderStatus refunds on this transition)
+  cancelled: ["refunded"],
 };
 
 export async function updateProductStatus(

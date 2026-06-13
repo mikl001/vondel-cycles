@@ -11,12 +11,16 @@ import {
   type OrderTotals,
 } from "@/lib/cart/totals";
 import { inclBtwCents, lt } from "@/lib/format";
+import { qualifiesForReverseCharge } from "@/lib/orders/reverse-charge";
 import { absoluteUrl, siteUrl } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Locale } from "@/i18n/routing";
 import type { Json } from "@/types/database.types";
 
 type Admin = ReturnType<typeof createAdminClient>;
+
+// re-exported so existing importers (checkout/preview route) keep working
+export { qualifiesForReverseCharge };
 
 export interface Address {
   firstName: string;
@@ -56,8 +60,6 @@ export class CheckoutError extends Error {
   }
 }
 
-const EU_VAT_RE = /^(AT|BE|BG|HR|CY|CZ|DK|EE|FI|FR|DE|EL|HU|IE|IT|LV|LT|LU|MT|NL|PL|PT|RO|SK|SI|ES|SE)[0-9A-Z]{8,12}$/;
-
 function validateAddress(a: Address | undefined): a is Address {
   if (!a) return false;
   return Boolean(
@@ -68,16 +70,6 @@ function validateAddress(a: Address | undefined): a is Address {
       NL_POSTCODE_RE.test(a.postcode?.replace(/\s/g, "") ?? "") &&
       a.city?.trim(),
   );
-}
-
-/** B2B with a syntactically valid non-NL EU VAT id -> intra-EU reverse charge. */
-export function qualifiesForReverseCharge(
-  customerType: "b2c" | "b2b",
-  vatNumber: string | undefined,
-): boolean {
-  if (customerType !== "b2b" || !vatNumber) return false;
-  const clean = vatNumber.replace(/[\s.]/g, "").toUpperCase();
-  return EU_VAT_RE.test(clean) && !clean.startsWith("NL");
 }
 
 async function resolvePromo(
@@ -143,6 +135,10 @@ export async function priceCheckout(
     vatRate: i.vatRate,
   }));
 
+  // Deliberate policy: the free-shipping threshold is evaluated on the
+  // pre-discount product total, so a promo code never tips an order over the
+  // free-shipping line. (To make free shipping re-evaluate after the discount,
+  // pass the discounted incl total here instead.)
   const productTotalIncl = cart.totals.totalInclCents;
   const shippingExclCents = shippingCostCents(method, productTotalIncl);
 
@@ -305,10 +301,11 @@ export async function finalizePayment(
   // Paid but unfulfillable (lost the stock race). finalize_order already
   // committed status='cancelled' + a durable 'oversold' event inside the
   // transaction, so the intent survives a crash here. Attempt the refund and
-  // ONLY advance to 'refunded' when it actually succeeds; on failure leave the
-  // order 'cancelled' and log a 'refund_failed' event so a reconciliation sweep
-  // (querying oversold-without-refund orders) can retry. We never claim a
-  // refund we did not make.
+  // ONLY advance to 'refunded' when it actually succeeds; on failure log a
+  // 'refund_failed' event and leave the order 'cancelled'. The /api/cron/
+  // retry-refunds sweep retries those, and an admin can also refund the
+  // cancelled order from the back-office. We never claim a refund we did not
+  // make, and a transient refund failure is recoverable, not terminal.
   if (result.outcome === "oversold") {
     try {
       const { data: ord } = await supabase
@@ -318,7 +315,12 @@ export async function finalizePayment(
         .maybeSingle();
       if (ord?.payment_id) {
         await getPaymentAdapter().refundPayment(ord.payment_id);
-        await supabase.from("orders").update({ status: "refunded" }).eq("id", orderId);
+        // conditional flip (optimistic concurrency) — only from 'cancelled'
+        await supabase
+          .from("orders")
+          .update({ status: "refunded" })
+          .eq("id", orderId)
+          .eq("status", "cancelled");
         await supabase
           .from("order_events")
           .insert({ order_id: orderId, event_type: "refunded" })

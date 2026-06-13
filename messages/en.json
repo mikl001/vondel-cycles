@@ -104,7 +104,8 @@
     "checkout": "Checkout",
     "continueShopping": "Continue shopping",
     "addedToCart": "Added to cart",
-    "adjusted": "Quantity adjusted to the available stock"
+    "adjusted": "Quantity adjusted to the available stock",
+    "cartUpdated": "Cart updated"
   },
   "checkout": {
     "title": "Checkout",
@@ -168,6 +169,7 @@
     "notFound": "Order not found.",
     "status": "Status",
     "items": "Ordered items",
+    "pricesExcl": "Prices excl. VAT",
     "subtotal": "Subtotal (excl. VAT)",
     "discount": "Discount",
     "shipping": "Shipping (excl. VAT)",
@@ -200,6 +202,7 @@
       "invalid_credentials": "Incorrect email and password combination.",
       "user_already_exists": "An account with this email already exists.",
       "weak_password": "The password must be at least 8 characters.",
+      "rate_limited": "Too many attempts. Please wait a moment and try again.",
       "error": "Something went wrong. Please try again."
     }
   },

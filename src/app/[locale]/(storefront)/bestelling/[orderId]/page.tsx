@@ -78,8 +78,11 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
       </div>
 
       <section className="rounded-xl border border-vondel-100 bg-white">
-        <h2 className="border-b border-vondel-100 px-5 py-3 font-semibold text-vondel-900">
+        <h2 className="flex items-baseline justify-between border-b border-vondel-100 px-5 py-3 font-semibold text-vondel-900">
           {t("items")}
+          <span className="text-xs font-normal text-vondel-400">
+            {t("pricesExcl")}
+          </span>
         </h2>
         <ul className="divide-y divide-vondel-100 px-5">
           {order.items.map((item) => (

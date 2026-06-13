@@ -56,7 +56,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           if (!cancelled) setPending(false);
         });
     void load();
-    // external mutations (reorder, login merge) announce themselves via event
+    // external mutations (reorder, login merge) re-fetch via this event
     const onRefresh = () => void load();
     window.addEventListener("cart:refresh", onRefresh);
     return () => {
@@ -127,15 +127,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           0,
         ),
       }));
-      await mutate(() =>
+      const view = await mutate(() =>
         fetch(`/api/cart/items/${itemId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ quantity }),
         }),
       );
+      if (view) setAnnounce(`${t("cartUpdated")} (${view.itemCount})`);
     },
-    [mutate],
+    [mutate, t],
   );
 
   const removeItem = useCallback(
@@ -148,9 +149,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
         };
       });
-      await mutate(() => fetch(`/api/cart/items/${itemId}`, { method: "DELETE" }));
+      const view = await mutate(() =>
+        fetch(`/api/cart/items/${itemId}`, { method: "DELETE" }),
+      );
+      if (view) setAnnounce(`${t("cartUpdated")} (${view.itemCount})`);
     },
-    [mutate],
+    [mutate, t],
   );
 
   const value = useMemo(

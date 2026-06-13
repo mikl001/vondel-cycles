@@ -53,7 +53,12 @@ export function SearchBox() {
         // aborted or offline — keep previous suggestions
       }
     }, 150);
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      // abort an in-flight request on unmount / locale change so no setState
+      // fires after teardown
+      abortRef.current?.abort();
+    };
   }, [query, locale]);
 
   useEffect(() => {

@@ -131,6 +131,24 @@ describe("calculateOrderTotals", () => {
     expect(t.totalInclCents).toBe(102000 + 409);
   });
 
+  it("reverse-charge totals foot to subtotal + shipping (no VAT)", () => {
+    // the confirmation/invoice present excl line totals under reverse charge,
+    // so subtotalExcl + shipping must equal the grand total with VAT == 0
+    const t = calculateOrderTotals(
+      [
+        { unitPriceExclCents: 45372, quantity: 2, vatRate: 21 },
+        { unitPriceExclCents: 2293, quantity: 3, vatRate: 9 },
+      ],
+      { shippingExclCents: 495, reverseCharge: true },
+    );
+    const subtotalExcl = 45372 * 2 + 2293 * 3;
+    expect(t.subtotalExclCents).toBe(subtotalExcl);
+    expect(t.vatTotalCents).toBe(0);
+    expect(t.totalInclCents).toBe(subtotalExcl + 495);
+    // every VAT-breakdown entry is zero under reverse charge
+    expect(Object.values(t.vatBreakdown).every((c) => c === 0)).toBe(true);
+  });
+
   it("discount allocation always sums exactly (largest remainder)", () => {
     // 3 cents discount over two groups with awkward shares
     const t = calculateOrderTotals(

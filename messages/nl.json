@@ -104,7 +104,8 @@
     "checkout": "Afrekenen",
     "continueShopping": "Verder winkelen",
     "addedToCart": "Toegevoegd aan winkelwagen",
-    "adjusted": "Aantal aangepast aan de beschikbare voorraad"
+    "adjusted": "Aantal aangepast aan de beschikbare voorraad",
+    "cartUpdated": "Winkelwagen bijgewerkt"
   },
   "checkout": {
     "title": "Afrekenen",
@@ -168,6 +169,7 @@
     "notFound": "Bestelling niet gevonden.",
     "status": "Status",
     "items": "Bestelde artikelen",
+    "pricesExcl": "Prijzen excl. btw",
     "subtotal": "Subtotaal (excl. btw)",
     "discount": "Korting",
     "shipping": "Verzending (excl. btw)",
@@ -200,6 +202,7 @@
       "invalid_credentials": "Onjuiste combinatie van e-mail en wachtwoord.",
       "user_already_exists": "Er bestaat al een account met dit e-mailadres.",
       "weak_password": "Het wachtwoord moet minimaal 8 tekens lang zijn.",
+      "rate_limited": "Te veel pogingen. Wacht even en probeer het opnieuw.",
       "error": "Er ging iets mis. Probeer het opnieuw."
     }
   },

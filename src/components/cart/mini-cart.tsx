@@ -43,11 +43,18 @@ export function MiniCartDrawer() {
   const trapRef = useFocusTrap<HTMLElement>(drawerOpen);
 
   useEffect(() => {
+    if (!drawerOpen) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setDrawerOpen(false);
     }
-    if (drawerOpen) document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKey);
+    // lock background scroll while the modal drawer is open
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [drawerOpen, setDrawerOpen]);
 
   if (!drawerOpen) return null;

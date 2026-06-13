@@ -10,10 +10,13 @@ export default async function AdminDashboardPage() {
       admin.from("profiles").select("id", { count: "exact", head: true }),
     ]);
 
+  // orders / revenue_cents are Postgres bigint -> PostgREST serializes them as
+  // JSON strings; coerce with Number() before any arithmetic so the KPI cards
+  // sum rather than string-concatenate ("0" + "3" + "5").
   const totals = (sales ?? []).reduce(
     (acc, day) => ({
-      orders: acc.orders + day.orders,
-      revenue: acc.revenue + day.revenue_cents,
+      orders: acc.orders + Number(day.orders),
+      revenue: acc.revenue + Number(day.revenue_cents),
     }),
     { orders: 0, revenue: 0 },
   );

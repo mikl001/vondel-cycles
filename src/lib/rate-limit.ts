@@ -60,11 +60,38 @@ async function upstashLimit(
 }
 
 export function clientIp(request: NextRequest): string {
+  return ipFromHeaders(request.headers);
+}
+
+/** IP extraction from a bare Headers object — usable from Server Actions,
+ *  which have no NextRequest but can read next/headers headers(). */
+export function ipFromHeaders(headers: Headers): string {
   return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    request.headers.get("x-real-ip") ??
+    headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    headers.get("x-real-ip") ??
     "unknown"
   );
+}
+
+/**
+ * Rate-limit by an explicit identity string (e.g. an IP from a Server Action),
+ * rather than a NextRequest. Returns true when the request is allowed.
+ */
+export async function rateLimitByKey(
+  name: string,
+  identity: string,
+  opts: { limit: number; windowMs: number },
+): Promise<boolean> {
+  const key = `rl:${name}:${identity}`;
+  const hasUpstash =
+    !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN;
+  try {
+    return hasUpstash
+      ? await upstashLimit(key, opts.limit, opts.windowMs)
+      : await memoryLimit(key, opts.limit, opts.windowMs);
+  } catch {
+    return true;
+  }
 }
 
 /**
@@ -99,4 +126,5 @@ export const LIMITS = {
   wishlist: { limit: 60, windowMs: 60_000 },
   account: { limit: 10, windowMs: 60_000 },
   invoice: { limit: 20, windowMs: 60_000 },
+  auth: { limit: 10, windowMs: 60_000 },
 } as const;

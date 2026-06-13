@@ -4,6 +4,9 @@ import { LIMITS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/security";
 import { createClient } from "@/lib/supabase/server";
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Wishlist state for the current user (RLS-scoped). Anonymous -> empty. */
 export async function GET() {
   const supabase = await createClient();
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
   const productId = body.productId ?? "";
-  if (!/^[0-9a-f-]{36}$/i.test(productId)) {
+  if (!UUID_RE.test(productId)) {
     return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
 
