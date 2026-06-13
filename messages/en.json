@@ -8,10 +8,8 @@
   "nav": {
     "home": "Home",
     "search": "Search",
-    "searchPlaceholder": "Search bikes, accessories…",
     "cart": "Cart",
     "account": "Account",
-    "menu": "Menu",
     "categories": "Categories",
     "breadcrumb": "Breadcrumb"
   },
@@ -74,8 +72,6 @@
     "priceMax": "Max",
     "onlyInStock": "In stock only",
     "clearAll": "Clear all filters",
-    "apply": "Apply",
-    "showResults": "Show results",
     "sortLabel": "Sort by",
     "sort": {
       "newest": "Newest",
@@ -153,10 +149,8 @@
   "payment": {
     "title": "Demo payment",
     "explainer": "This replaces the real Mollie/iDEAL payment page in this demo environment. In production you would now be on your bank's secure page.",
-    "amount": "Amount due",
     "pay": "Pay (demo iDEAL)",
-    "cancel": "Cancel payment",
-    "notFound": "Payment not found."
+    "cancel": "Cancel payment"
   },
   "confirmation": {
     "title": "Order {orderNumber}",
@@ -166,7 +160,6 @@
     "pendingText": "One moment please, we're waiting for the payment confirmation.",
     "failedTitle": "Payment unsuccessful",
     "failedText": "The payment was cancelled or failed. You can try again from your cart.",
-    "notFound": "Order not found.",
     "status": "Status",
     "items": "Ordered items",
     "pricesExcl": "Prices excl. VAT",
@@ -273,8 +266,7 @@
       "deleteTitle": "Delete account",
       "deleteText": "Your account and personal data will be permanently deleted. Orders are anonymized (legal retention for invoices still applies).",
       "deleteButton": "Delete my account",
-      "deleteConfirm": "Type DELETE to confirm",
-      "deleted": "Your account has been deleted."
+      "deleteConfirm": "Type DELETE to confirm"
     }
   },
   "errors": {

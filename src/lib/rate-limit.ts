@@ -63,14 +63,24 @@ export function clientIp(request: NextRequest): string {
   return ipFromHeaders(request.headers);
 }
 
-/** IP extraction from a bare Headers object — usable from Server Actions,
- *  which have no NextRequest but can read next/headers headers(). */
+/**
+ * IP extraction from a bare Headers object — usable from Server Actions too.
+ *
+ * Assumes a single trusted proxy (Vercel). The platform sets `x-real-ip` to the
+ * true client and APPENDS the real client to `x-forwarded-for`, so we must NOT
+ * trust the LEFTMOST x-forwarded-for value — a client can prefix its own
+ * spoofed entry there to evade per-IP limits. Prefer x-real-ip, then the
+ * RIGHTMOST x-forwarded-for hop (the one the trusted proxy appended).
+ */
 export function ipFromHeaders(headers: Headers): string {
-  return (
-    headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    headers.get("x-real-ip") ??
-    "unknown"
-  );
+  const realIp = headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+  const xff = headers.get("x-forwarded-for");
+  if (xff) {
+    const parts = xff.split(",").map((s) => s.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  return "unknown";
 }
 
 /**

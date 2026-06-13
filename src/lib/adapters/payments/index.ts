@@ -87,9 +87,24 @@ function createMollieAdapter(apiKey: string): PaymentAdapter {
         headers,
         body: JSON.stringify({}),
       });
-      if (!res.ok) {
-        throw new Error(`Mollie refund failed: ${res.status} ${await res.text()}`);
+      if (res.ok) return;
+      // Make the refund idempotent: a retry after a successful refund (e.g. the
+      // status-flip failed and the reconciliation cron re-runs) gets a 422
+      // "amount exceeds the remaining amount". Treat that as already-refunded by
+      // confirming a refund exists, so recovery converges instead of looping.
+      if (res.status === 422) {
+        const existing = await fetch(
+          `${MOLLIE_API}/payments/${paymentId}/refunds`,
+          { headers },
+        );
+        if (existing.ok) {
+          const data = (await existing.json()) as {
+            _embedded?: { refunds?: unknown[] };
+          };
+          if ((data._embedded?.refunds?.length ?? 0) > 0) return;
+        }
       }
+      throw new Error(`Mollie refund failed: ${res.status} ${await res.text()}`);
     },
   };
 }

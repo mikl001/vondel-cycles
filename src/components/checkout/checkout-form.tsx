@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import type { PickupPoint } from "@/lib/adapters/shipping";
 import type { OrderTotals } from "@/lib/cart/totals";
+import { qualifiesForReverseCharge } from "@/lib/orders/reverse-charge";
 import { formatCents, lt } from "@/lib/format";
 import type { LocalizedText } from "@/types/catalog";
 
@@ -52,11 +53,9 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
   const [error, setError] = useState<string | null>(null);
 
   const selectedMethod = methods.find((m) => m.code === methodCode);
-  const reverseChargeLikely =
-    customerType === "b2b" &&
-    /^(?!NL)[A-Z]{2}[0-9A-Z]{8,12}$/.test(
-      vatNumber.replace(/[\s.]/g, "").toUpperCase(),
-    );
+  // use the exact authoritative server check (a pure, client-safe import) so
+  // the hint can never show for an order that will be charged WITH VAT
+  const reverseChargeLikely = qualifiesForReverseCharge(customerType, vatNumber);
 
   // postcode + huisnummer -> street/city autofill (the NL standard)
   useEffect(() => {
@@ -364,7 +363,16 @@ export function CheckoutForm({ methods }: { methods: ShippingMethodView[] }) {
               <span className="truncate">
                 {item.quantity}× {lt(item.productName, locale)}
               </span>
-              <span className="shrink-0">{formatCents(item.lineInclCents, locale)}</span>
+              {/* under reverse charge the totals are excl VAT, so show excl line
+                  totals here too rather than the incl price (no mismatch) */}
+              <span className="shrink-0">
+                {formatCents(
+                  totals?.reverseCharge
+                    ? item.unitPriceExclCents * item.quantity
+                    : item.lineInclCents,
+                  locale,
+                )}
+              </span>
             </li>
           ))}
         </ul>

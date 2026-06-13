@@ -325,6 +325,14 @@ export async function finalizePayment(
           .from("order_events")
           .insert({ order_id: orderId, event_type: "refunded" })
           .then(undefined, () => {});
+      } else {
+        // no payment to refund (shouldn't happen for a paid order) — still mark
+        // it so the order surfaces in the reconciliation sweep rather than
+        // silently staying cancelled with no refund trail
+        await supabase
+          .from("order_events")
+          .insert({ order_id: orderId, event_type: "refund_failed" })
+          .then(undefined, () => {});
       }
     } catch (err) {
       console.error("[finalize] oversold refund failed:", err);

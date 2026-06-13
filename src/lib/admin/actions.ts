@@ -69,7 +69,8 @@ export async function updateOrderStatus(
   if (!allowed.includes(status)) throw new Error("invalid_transition");
 
   if (status === "refunded") {
-    // Mollie (test) refunds go through the API; the mock provider is a no-op.
+    // Mollie (test) refunds go through the API (idempotent on a retry); the
+    // mock provider is a no-op.
     if (order.payment_id) {
       await getPaymentAdapter().refundPayment(order.payment_id);
     }
@@ -80,11 +81,17 @@ export async function updateOrderStatus(
     });
   }
 
-  const { error: err2 } = await admin
+  // optimistic-concurrency guard: only transition if the order is still in the
+  // status we validated against, so two operators (or an operator racing the
+  // reconciliation cron) can't double-apply
+  const { data: updated, error: err2 } = await admin
     .from("orders")
     .update({ status })
-    .eq("id", orderId);
+    .eq("id", orderId)
+    .eq("status", order.status)
+    .select("id");
   if (err2) throw err2;
+  if (!updated?.length) throw new Error("stale_status");
   await admin.from("order_events").insert({
     order_id: orderId,
     event_type: `status_${status}`,

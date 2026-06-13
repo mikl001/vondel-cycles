@@ -95,26 +95,35 @@ export async function POST(request: NextRequest) {
     const sku = cols[skuIdx]?.trim();
     if (!sku) continue;
     const stock = Number(cols[stockIdx]);
-    const priceRaw = priceIdx >= 0 ? (cols[priceIdx]?.trim() ?? "") : "";
     if (!Number.isInteger(stock) || stock < 0 || stock > 9999) {
       unknown.push(sku);
       continue;
     }
-    // empty price cell clears the override; a present cell must be a valid
-    // non-negative integer (0 is a legitimate override, not a clear)
-    let priceCents: number | null = null;
-    if (priceRaw !== "") {
-      const p = Number(priceRaw);
-      if (!Number.isInteger(p) || p < 0 || p > 100_000_000) {
-        unknown.push(sku);
-        continue;
+
+    const update: { stock_quantity: number; price_cents?: number | null } = {
+      stock_quantity: stock,
+    };
+    // Only touch the price override when the price column is actually present
+    // in the uploaded CSV — a stock-only import must not silently wipe every
+    // override. When present: an empty cell clears the override; a present cell
+    // must be a valid non-negative integer (0 is a legitimate override).
+    if (priceIdx >= 0) {
+      const priceRaw = cols[priceIdx]?.trim() ?? "";
+      if (priceRaw === "") {
+        update.price_cents = null;
+      } else {
+        const p = Number(priceRaw);
+        if (!Number.isInteger(p) || p < 0 || p > 100_000_000) {
+          unknown.push(sku);
+          continue;
+        }
+        update.price_cents = p;
       }
-      priceCents = p;
     }
 
     const { data, error } = await admin
       .from("product_variants")
-      .update({ stock_quantity: stock, price_cents: priceCents })
+      .update(update)
       .eq("sku", sku)
       .select("id");
     if (error || !data?.length) unknown.push(sku);

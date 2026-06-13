@@ -99,7 +99,8 @@ Useful scripts:
    configure the custom access token hook (Dashboard → Auth → Hooks) and run
    the seed + image upload + make-admin scripts against the hosted project.
 2. Vercel: set the env vars from `.env.example` (plus `MOLLIE_API_KEY` test
-   key, `CRON_SECRET`, Upstash credentials) and add a cron entry for
-   `/api/cron/abandoned-carts`.
+   key, `CRON_SECRET`, Upstash credentials). `vercel.json` already declares the
+   two daily crons — `/api/cron/abandoned-carts` and `/api/cron/retry-refunds`
+   (the refund reconciliation sweep) — both `CRON_SECRET`-protected.
 3. Point `NEXT_PUBLIC_SITE_URL` at the deployment so Mollie webhooks and
    sitemap/canonical URLs resolve.

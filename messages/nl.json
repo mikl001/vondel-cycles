@@ -8,10 +8,8 @@
   "nav": {
     "home": "Home",
     "search": "Zoeken",
-    "searchPlaceholder": "Zoek fietsen, accessoires…",
     "cart": "Winkelwagen",
     "account": "Account",
-    "menu": "Menu",
     "categories": "Categorieën",
     "breadcrumb": "Kruimelpad"
   },
@@ -74,8 +72,6 @@
     "priceMax": "Max",
     "onlyInStock": "Alleen op voorraad",
     "clearAll": "Wis alle filters",
-    "apply": "Toepassen",
-    "showResults": "Toon resultaten",
     "sortLabel": "Sorteren",
     "sort": {
       "newest": "Nieuwste",
@@ -153,10 +149,8 @@
   "payment": {
     "title": "Demo-betaling",
     "explainer": "Dit vervangt de echte Mollie/iDEAL-betaalpagina in deze demo-omgeving. In productie zou je nu op de beveiligde pagina van de bank staan.",
-    "amount": "Te betalen",
     "pay": "Betaal (demo-iDEAL)",
-    "cancel": "Annuleer betaling",
-    "notFound": "Betaling niet gevonden."
+    "cancel": "Annuleer betaling"
   },
   "confirmation": {
     "title": "Bestelling {orderNumber}",
@@ -166,7 +160,6 @@
     "pendingText": "Een ogenblik geduld, we wachten op de betaalbevestiging.",
     "failedTitle": "Betaling niet gelukt",
     "failedText": "De betaling is geannuleerd of mislukt. Je kunt het opnieuw proberen vanuit je winkelwagen.",
-    "notFound": "Bestelling niet gevonden.",
     "status": "Status",
     "items": "Bestelde artikelen",
     "pricesExcl": "Prijzen excl. btw",
@@ -273,8 +266,7 @@
       "deleteTitle": "Account verwijderen",
       "deleteText": "Je account en persoonsgegevens worden permanent verwijderd. Bestellingen worden geanonimiseerd (wettelijke bewaarplicht voor facturen blijft gelden).",
       "deleteButton": "Verwijder mijn account",
-      "deleteConfirm": "Typ VERWIJDER om te bevestigen",
-      "deleted": "Je account is verwijderd."
+      "deleteConfirm": "Typ VERWIJDER om te bevestigen"
     }
   },
   "errors": {
